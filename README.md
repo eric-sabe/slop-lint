@@ -110,7 +110,7 @@ const { em, hits } = lintText("In today's fast-paced world we leverage synergy."
 - **Em-dash** (U+2014): failure.
 - **~100 focal and marketing words**: delve, intricate, meticulous, pivotal, tapestry, realm, testament, leverage, synergy, robust, seamless, holistic, empower, harness, unleash, landscape, journey, ecosystem, bolster, groundbreaking, renowned, innovative, streamline, actionable, and friends.
 - **~45 phrases and constructions**: "in today's ... world", "plays a crucial role", "it's worth noting that", "let's dive in", "in conclusion", "as an AI language model", "rich cultural heritage", "a diverse array of", "not just X but Y", "it's not X, it's Y", and more.
-- **Double hyphen** used as an em-dash substitute, and **emoji**.
+- **Double hyphen** used as an em-dash substitute, **smart/curly quotes** (a generator/word-processor tell), and **emoji**.
 
 The catalogue draws on corpus studies (the FSU "delve" focal-word analysis, a PubMed 135-term study, Gray's "meticulously commendable") plus published Pangram / Grammarly / practitioner blacklists. Tune `WORDS` and `PHRASES` at the top of `slop-lint.mjs` to taste.
 
@@ -134,6 +134,8 @@ Tells are a moving target: each model family brings new ones, and old ones fade 
   ```
 
   Set the model versions in `.env` (`XAI_MODEL`, `ANTHROPIC_MODEL`, etc.; copy `.env.example`) and just bump them there when a new model ships - no code or tracked-config edits. See [`corpus/README.md`](corpus/README.md).
+- **Build the human baseline** with `npm run baseline` (`build-baseline.mjs`): pulls permissive prose (English Wikinews, CC BY 2.5; public-domain Project Gutenberg) into `corpus/baseline/` with attribution in `SOURCES.md`. The strongest baseline is a large body of your own trusted contemporary prose; this is a reproducible starter. (Note: vs-human is only as good as the baseline; with a partly dated one it surfaces register differences, so cross-model stays the more reliable read.)
+- **Measure typography** with `npm run stats` (`corpus-stats.mjs`): em-dash, smart-quote, semicolon, ellipsis, and bold rates per model - the typographic tells the word-based `--discover` can't see (GPT/Grok emit ~9 curly quotes per 1k words; Claude none). One caveat it surfaced: literary/typeset human prose also em-dashes heavily, so the em-dash is a tell of *plain modern typed text* (posts, email, markdown), which is what slop-lint targets - not of prose in general.
 - **A monthly sweep does this for you.** `.github/workflows/catalogue-refresh.yml` runs `refresh.mjs` on a schedule, with no secrets: it combines corpus discovery with a coverage diff against the public Wikipedia "Signs of AI writing" essay, and files the candidates as a GitHub issue to review.
 
 Accepting a candidate means adding it to `WORD_GROUPS` (or `PHRASES`) with a source, noting it in `CHANGELOG.md`, and bumping the version. Keep the conservative bias: a tell earns its place with a source, and fading tells get pruned.

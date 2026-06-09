@@ -5,7 +5,9 @@ tokens that are far more common in model output than in a reference set, and not
 the catalogue, are surfaced for review.
 
 ```
-baseline/         human-written reference text
+baseline/         human reference prose (built by ../build-baseline.mjs; see SOURCES.md)
+  wikinews/         English Wikinews articles (CC BY 2.5)
+  gutenberg/        public-domain Project Gutenberg excerpts
 samples/<model>/  one folder per model, holding that model's answers to the prompt set
 ```
 
@@ -32,10 +34,15 @@ Re-run when a model ships a new version (bump the `*_MODEL` ids in `.env` first;
 `../.env.example`), commit the refreshed `samples/`, and the monthly refresh will mine it
 with no keys needed.
 
-## The example folder
+## The baseline
 
-`samples/example-llm/` and `baseline/human-sample.md` are tiny illustrative files so the
-demo runs out of the box. They are **not** real model output, and the baseline does not
-match the prompts' genres, so the demo will over-rank topic words (`organizations`,
-`insights`). For real signal, generate proper samples and use a genre-matched human
-baseline; a human reviewer then keeps the style tells and drops the topic words.
+`baseline/` is built by `../build-baseline.mjs` (`npm run baseline`) from permissive
+sources (Wikinews CC BY 2.5 + public-domain Gutenberg); see `baseline/SOURCES.md` for
+attribution. It is broad rather than perfectly genre-matched, and partly dated, so the
+**vs-human** comparison surfaces some register differences (older prose under-uses modern
+words). The **vs-pool** comparison (a model against the other models on identical prompts)
+holds topic constant and is the more reliable read. The strongest baseline you can supply
+is a large body of your own trusted contemporary prose - drop it in and re-run.
+
+`samples/example-llm/` is a tiny illustrative folder (not real model output) so the demo
+runs before you generate anything.

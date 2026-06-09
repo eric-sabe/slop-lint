@@ -4,6 +4,34 @@ Notable changes to the slop-lint tool and its tell catalogue. Format roughly fol
 [Keep a Changelog](https://keepachangelog.com/); the package version and the catalogue
 version move together.
 
+## [0.6.0]
+
+### Added
+
+- **Smart/curly-quote warning.** Curly quotes and apostrophes (`“” ‘’`) are flagged as a
+  generator/word-processor tell. Found empirically: three of four frontier models emit them
+  in markdown output (GPT and Grok ~9 per 1k words) while one uses straight quotes.
+- **`build-baseline.mjs`** (`npm run baseline`): assembles a human reference corpus for
+  `--discover` from permissive sources - English Wikinews (CC BY 2.5) and public-domain
+  Project Gutenberg books - with a `corpus/baseline/SOURCES.md` attribution file. Replaces
+  the toy placeholder baseline (~43k words across 19 files).
+- **`corpus-stats.mjs`** (`npm run stats`): punctuation/structure rates per corpus folder
+  (em-dash, smart quotes, semicolons, ellipses, bold), surfacing typographic tells that
+  the word-based `--discover` cannot see (e.g. GPT and Grok emit ~9 curly quotes per 1k
+  words; Claude emits none).
+
+### Notes
+
+- Measuring punctuation against the baseline corrected an assumption: literary/typeset
+  human prose (our Gutenberg baseline) uses the em-dash, curly quotes, and semicolons
+  *heavily* too (~7, ~33, ~4 per 1k). So the em-dash is a tell of **plain modern typed
+  text** (posts, email, markdown) - slop-lint's target - not of prose in general. The
+  hard-fail stands for that target; the corpus does not "prove" it against literary prose.
+- With a real (but partly dated, partly literary) baseline, the vs-human word comparison
+  improved yet remains register-dominated (older prose under-uses modern words like
+  "create"), so the reliable signal is still cross-model. A larger contemporary,
+  plain-prose, genre-matched baseline would sharpen vs-human further.
+
 ## [0.5.0]
 
 ### Added

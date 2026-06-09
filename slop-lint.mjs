@@ -30,7 +30,7 @@ import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join, sep, extname } from "node:path";
 import { pathToFileURL } from "node:url";
 
-export const VERSION = "0.5.0";
+export const VERSION = "0.6.0";
 
 // Catalogue, grouped by provenance. Each group carries the version it was added in
 // and its source, so the list can be pruned with confidence as tells fade. Edit a
@@ -162,6 +162,7 @@ export const PHRASES = [
 
 export const EMOJI = /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{2190}-\u{21FF}\u{2B00}-\u{2BFF}]/u;
 const DOUBLEDASH = /(^|\s)--(\s|$)|\w--\w/; // em-dash approximation
+const SMARTQUOTE = /[“”‘’]/; // curly quotes/apostrophes: a generator/word-processor tell in plaintext or markdown
 const reWord = (w) => new RegExp(`\\b${w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i");
 
 const DEFAULT_EXTS = [".md", ".markdown", ".mdx", ".txt"];
@@ -179,6 +180,7 @@ export function lintText(text) {
     if (DOUBLEDASH.test(line)) hits.push(`  ${n}: ⚠ "--" (em-dash approximation)`);
     for (const w of WORDS) if (reWord(w).test(line)) hits.push(`  ${n}: ⚠ word "${w}"`);
     for (const p of PHRASES) if (p.re.test(line)) hits.push(`  ${n}: ⚠ ${p.msg}`);
+    if (SMARTQUOTE.test(line)) hits.push(`  ${n}: ⚠ smart/curly quote`);
     if (EMOJI.test(line)) hits.push(`  ${n}: ⚠ emoji`);
   });
   return { em, hits };

@@ -37,6 +37,12 @@ test("flags double-hyphen em-dash substitute and emoji", () => {
   assert.ok(lintText("ship it 🚀").hits.some((h) => h.includes("emoji")));
 });
 
+test("flags smart/curly quotes (a generator/word-processor tell), not straight quotes", () => {
+  assert.ok(lintText("He said “hello” there.").hits.some((h) => h.includes("smart/curly quote")));
+  assert.ok(lintText("It’s fine.").hits.some((h) => h.includes("smart/curly quote")));
+  assert.equal(lintText('He said "hello" there.').hits.filter((h) => h.includes("smart/curly")).length, 0);
+});
+
 test("word matching is case-insensitive and whole-word", () => {
   assert.ok(lintText("LEVERAGE this").hits.some((h) => h.includes('word "leverage"')));
   assert.equal(lintText("the leveraged buyout").hits.filter((h) => h.includes('word "leverage"')).length, 0);
