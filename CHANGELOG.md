@@ -4,6 +4,28 @@ Notable changes to the slop-lint tool and its tell catalogue. Format roughly fol
 [Keep a Changelog](https://keepachangelog.com/); the package version and the catalogue
 version move together.
 
+## [0.3.0]
+
+### Added
+
+- First reviewed pass from the catalogue-refresh sweep (sources: the Wikipedia "Signs of
+  AI writing" essay plus practitioner blacklists). New words: bolster(s/ed/ing),
+  groundbreaking, renowned, exemplifies, encompassing, enhance(s/d/ing), innovative,
+  streamline(s/d) / streamlining, actionable, nestled. New phrases: "as an AI/large
+  language model" and "I hope this helps" (assistant leakage), "in the heart of",
+  "a diverse array of", "valuable insights", "stands/serves as a testament", "setting
+  the stage for", "indelible mark", "deeply rooted in", "rich cultural heritage/tapestry".
+
+### Changed
+
+- `refresh.mjs` coverage check now also considers existing phrase rules, so candidates
+  already covered by a `PHRASES` pattern (e.g. "in conclusion") are no longer reported.
+
+### Rejected (kept out to avoid false positives)
+
+- Words too common in ordinary writing to gate on: crucial, such as, overall, rich,
+  featuring, align with, commitment to, ensuring, refers to.
+
 ## [0.2.0]
 
 ### Added

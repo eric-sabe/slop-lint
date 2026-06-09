@@ -108,8 +108,8 @@ const { em, hits } = lintText("In today's fast-paced world we leverage synergy."
 ## What it flags
 
 - **Em-dash** (U+2014): failure.
-- **~60 focal and marketing words**: delve, intricate, meticulous, pivotal, tapestry, realm, testament, leverage, synergy, robust, seamless, holistic, empower, harness, unleash, landscape, journey, ecosystem, and friends.
-- **~35 phrases and constructions**: "in today's ... world", "plays a crucial role", "it's worth noting that", "let's dive in", "in conclusion", "not just X but Y", "it's not X, it's Y", and more.
+- **~100 focal and marketing words**: delve, intricate, meticulous, pivotal, tapestry, realm, testament, leverage, synergy, robust, seamless, holistic, empower, harness, unleash, landscape, journey, ecosystem, bolster, groundbreaking, renowned, innovative, streamline, actionable, and friends.
+- **~45 phrases and constructions**: "in today's ... world", "plays a crucial role", "it's worth noting that", "let's dive in", "in conclusion", "as an AI language model", "rich cultural heritage", "a diverse array of", "not just X but Y", "it's not X, it's Y", and more.
 - **Double hyphen** used as an em-dash substitute, and **emoji**.
 
 The catalogue draws on corpus studies (the FSU "delve" focal-word analysis, a PubMed 135-term study, Gray's "meticulously commendable") plus published Pangram / Grammarly / practitioner blacklists. Tune `WORDS` and `PHRASES` at the top of `slop-lint.mjs` to taste.

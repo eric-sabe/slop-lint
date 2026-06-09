@@ -16,7 +16,7 @@
  */
 
 import { writeFileSync, existsSync } from "node:fs";
-import { discover, WORDS, VERSION } from "./slop-lint.mjs";
+import { discover, WORDS, PHRASES, VERSION } from "./slop-lint.mjs";
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 
@@ -69,8 +69,10 @@ async function wikipediaSection() {
     }
   }
   if (!items.size) return "## Wikipedia: Signs of AI writing\n\n_No parseable 'Words to watch' items this run (page format may have changed)._\n";
-  // A phrase is a coverage gap if none of its content words are already in WORDS.
+  // A phrase is a coverage gap if no existing phrase rule matches it and none of its
+  // content words are already in WORDS.
   const gaps = [...items].filter((phrase) => {
+    if (PHRASES.some((p) => p.re.test(phrase))) return false;
     const toks = phrase.match(/[a-z][a-z'-]{3,}/g) || [];
     return toks.length && !toks.some((t) => known.has(t));
   }).sort();

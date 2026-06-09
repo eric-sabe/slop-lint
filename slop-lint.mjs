@@ -30,7 +30,7 @@ import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join, sep, extname } from "node:path";
 import { pathToFileURL } from "node:url";
 
-export const VERSION = "0.2.0";
+export const VERSION = "0.3.0";
 
 // Catalogue, grouped by provenance. Each group carries the version it was added in
 // and its source, so the list can be pruned with confidence as tells fade. Edit a
@@ -73,6 +73,18 @@ export const WORD_GROUPS = [
     words: [
       "furthermore", "moreover", "additionally", "nonetheless", "nevertheless",
       "undoubtedly", "notably", "strategically",
+    ],
+  },
+  {
+    // Reviewed pass from the catalogue-refresh sweep. Common words that flood false
+    // positives (crucial, such as, overall, rich, featuring, align with) were rejected.
+    since: "0.3.0",
+    source: "Wikipedia: Signs of AI writing (Words to watch) + practitioner blacklists",
+    words: [
+      "bolster", "bolsters", "bolstered", "bolstering", "groundbreaking", "renowned",
+      "exemplifies", "encompassing", "enhance", "enhances", "enhancing", "enhanced",
+      "innovative", "streamline", "streamlines", "streamlined", "streamlining",
+      "actionable", "nestled",
     ],
   },
 ];
@@ -127,6 +139,17 @@ export const PHRASES = [
   // syntactic constructions
   { re: /\bnot (just|only)\b[^.?!]{0,60}\b(but|it'?s|they'?re|its)\b/i, msg: '"not just X, but Y"' },
   { re: /\b(it'?s|we'?re|they'?re)\s+(not|never)(\s+just)?\b[^.?!]{1,80}?\b(it'?s|we'?re|they'?re)\b/i, msg: '"it\'s not X, it\'s Y" negated contrast' },
+  // added 0.3.0 — Wikipedia: Signs of AI writing (assistant leakage + high-signal cliches)
+  { re: /\bas an? (ai|large) language model\b/i, msg: '"as an AI/large language model" (assistant leakage)' },
+  { re: /\bi hope this helps\b/i, msg: '"I hope this helps" (assistant sign-off)' },
+  { re: /\bin the heart of\b/i, msg: '"in the heart of"' },
+  { re: /\ba diverse array of\b/i, msg: '"a diverse array of"' },
+  { re: /\bvaluable insights\b/i, msg: '"valuable insights"' },
+  { re: /\b(stands|serves) as a testament\b/i, msg: '"stands/serves as a testament"' },
+  { re: /\bsetting the stage for\b/i, msg: '"setting the stage for"' },
+  { re: /\bindelible mark\b/i, msg: '"indelible mark"' },
+  { re: /\bdeeply rooted in\b/i, msg: '"deeply rooted in"' },
+  { re: /\brich (cultural )?(tapestry|heritage)\b/i, msg: '"rich cultural heritage/tapestry"' },
 ];
 
 export const EMOJI = /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{2190}-\u{21FF}\u{2B00}-\u{2BFF}]/u;
