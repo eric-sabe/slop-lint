@@ -4,6 +4,33 @@ Notable changes to the slop-lint tool and its tell catalogue. Format roughly fol
 [Keep a Changelog](https://keepachangelog.com/); the package version and the catalogue
 version move together.
 
+## [0.5.0]
+
+### Added
+
+- **`incredibly`** to the catalogue, the first add sourced from this repo's own corpus
+  discovery: one frontier model over-used it (in 7 of 24 answers) vs its peers on identical
+  prompts. Source tagged `empirical: cross-model corpus discovery`.
+- A real generated corpus under `corpus/samples/<model>/` (four current frontier models,
+  24 prompts each) replaces the toy sample as the discovery input.
+
+### Changed
+
+- `--discover` is hardened against two artifacts the first real run exposed:
+  - **Frontmatter is stripped** before tokenizing, so YAML keys (`model`, `prompt_id`)
+    no longer rank as tells.
+  - **Document-frequency floor** (`--min-docs`, default 3): a token must appear across
+    multiple sample documents, which drops one-off artifacts (e.g. an invented product
+    name repeated within a single answer) and keeps recurring style tells. The candidate
+    report now shows a `docs` column.
+
+### Notes
+
+- Cross-model comparison (each model vs the pool of the others on the same prompts) is the
+  reliable signal today, because topic is held constant. The vs-human comparison needs a
+  larger, genre-matched human baseline to be trustworthy; the committed `corpus/baseline`
+  is still a small placeholder.
+
 ## [0.4.1]
 
 ### Changed

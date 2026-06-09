@@ -125,7 +125,7 @@ Tells are a moving target: each model family brings new ones, and old ones fade 
   slop-lint --discover --samples corpus/samples --baseline corpus/baseline
   ```
 
-  Both `--samples` and `--baseline` take a comma-separated list of folders, so a model can be compared against a human baseline (general LLM tells) or against the **pool of other models** on the same prompts (that model's signature, with topic held constant).
+  Both `--samples` and `--baseline` take a comma-separated list of folders, so a model can be compared against a human baseline (general LLM tells) or against the **pool of other models** on the same prompts (that model's signature, with topic held constant). The model-vs-pool comparison is the more reliable one, because identical prompts hold topic constant; vs-human only works with a large, genre-matched human baseline. A `--min-docs` floor (default 3) requires a candidate to recur across multiple answers, so one-off artifacts are dropped; frontmatter is ignored.
 - **Generate the samples instead of pasting them.** `generate-samples.mjs` sends a fixed, genre-varied prompt set ([`prompts.json`](prompts.json)) to each model in [`models.json`](models.json) and writes `corpus/samples/<model>/`. Every model answers the same prompts, so differences are style, not subject. This is a local task (it needs API keys, which never touch CI); commit the result and the sweep mines it keyless.
 
   ```bash

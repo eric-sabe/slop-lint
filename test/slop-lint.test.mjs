@@ -85,6 +85,20 @@ test("discover never re-proposes a word already in the catalogue", () => {
   assert.ok(!cands.some((c) => c.token === "delve"));
 });
 
+test("discover filters one-off artifacts by document frequency", () => {
+  // "zorp" recurs across 2 docs; "blarg" is repeated within a single doc only.
+  const samples = ["zorp zorp zorp", "zorp zorp zorp", "blarg blarg blarg blarg blarg"];
+  const cands = discover(samples, ["alpha beta gamma delta"], { minCount: 2, minDocs: 2 });
+  const toks = cands.map((c) => c.token);
+  assert.ok(toks.includes("zorp"), "kept: appears across multiple documents");
+  assert.ok(!toks.includes("blarg"), "dropped: appears in only one document");
+});
+
+test("discover reports document frequency for surviving candidates", () => {
+  const cands = discover(["frobnch good", "frobnch fast", "frobnch bright"], ["plain ordinary sample words"], { minCount: 2, minDocs: 2 });
+  assert.ok(cands.some((c) => c.token === "frobnch" && c.docs === 3));
+});
+
 test("prompts.json and models.json are valid and consistent", () => {
   const p = JSON.parse(readFileSync("prompts.json", "utf8"));
   const m = JSON.parse(readFileSync("models.json", "utf8"));

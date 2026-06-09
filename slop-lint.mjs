@@ -30,7 +30,7 @@ import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join, sep, extname } from "node:path";
 import { pathToFileURL } from "node:url";
 
-export const VERSION = "0.4.0";
+export const VERSION = "0.5.0";
 
 // Catalogue, grouped by provenance. Each group carries the version it was added in
 // and its source, so the list can be pruned with confidence as tells fade. Edit a
@@ -86,6 +86,14 @@ export const WORD_GROUPS = [
       "innovative", "streamline", "streamlines", "streamlined", "streamlining",
       "actionable", "nestled",
     ],
+  },
+  {
+    // First catalogue add sourced from this repo's own corpus discovery: "incredibly"
+    // was heavily over-used by one frontier model (in 7 of 24 answers) vs its peers on
+    // identical prompts. A booster adverb in the same family as the 0.1.0 set.
+    since: "0.5.0",
+    source: "empirical: cross-model corpus discovery (--discover)",
+    words: ["incredibly"],
   },
 ];
 
@@ -215,38 +223,45 @@ const STOP = new Set((
 function tokenize(text) {
   return (text.toLowerCase().match(/[a-z][a-z'’-]{2,}/g) || []).filter((w) => !STOP.has(w));
 }
+// Per-text frequency + document frequency (how many texts a token appears in). Doc
+// frequency lets us drop one-off artifacts (an invented product name repeated within a
+// single answer) and keep tokens that recur across many answers - the real style tells.
 function freqMap(texts, { bigrams = true } = {}) {
-  const counts = new Map(); let total = 0;
+  const counts = new Map(), docs = new Map(); let total = 0;
   for (const t of texts) {
     const toks = tokenize(t);
+    const seen = new Set();
     for (let i = 0; i < toks.length; i++) {
-      counts.set(toks[i], (counts.get(toks[i]) || 0) + 1); total++;
+      counts.set(toks[i], (counts.get(toks[i]) || 0) + 1); total++; seen.add(toks[i]);
       if (bigrams && i + 1 < toks.length) {
         const bg = `${toks[i]} ${toks[i + 1]}`;
-        counts.set(bg, (counts.get(bg) || 0) + 1);
+        counts.set(bg, (counts.get(bg) || 0) + 1); seen.add(bg);
       }
     }
+    for (const tok of seen) docs.set(tok, (docs.get(tok) || 0) + 1);
   }
-  return { counts, total: total || 1 };
+  return { counts, total: total || 1, docs };
 }
-export function discover(sampleTexts, baselineTexts, { top = 30, minCount = 3 } = {}) {
+export function discover(sampleTexts, baselineTexts, { top = 30, minCount = 3, minDocs = 3 } = {}) {
   const S = freqMap(sampleTexts), B = freqMap(baselineTexts);
   const known = new Set(WORDS.map((w) => w.toLowerCase()));
   const smoothing = 1 / (B.total * 10);
+  const effMinDocs = Math.min(minDocs, sampleTexts.length); // small corpora still return something
   const out = [];
   for (const [tok, c] of S.counts) {
-    if (c < minCount || known.has(tok)) continue;
+    if (c < minCount || (S.docs.get(tok) || 0) < effMinDocs || known.has(tok)) continue;
     const sf = c / S.total;
     const bf = (B.counts.get(tok) || 0) / B.total;
-    out.push({ token: tok, count: c, sampleFreq: sf, baselineFreq: bf, ratio: sf / (bf + smoothing) });
+    out.push({ token: tok, count: c, docs: S.docs.get(tok), sampleFreq: sf, baselineFreq: bf, ratio: sf / (bf + smoothing) });
   }
   out.sort((a, b) => b.ratio - a.ratio || b.count - a.count);
   return out.slice(0, top);
 }
 
+const stripFrontmatter = (t) => t.replace(/^﻿?---\r?\n[\s\S]*?\r?\n---\r?\n/, "");
 function readAll(paths) {
   return walkFiles(paths, { exts: [".md", ".markdown", ".mdx", ".txt"] })
-    .map((f) => { try { return readFileSync(f, "utf8"); } catch { return ""; } });
+    .map((f) => { try { return stripFrontmatter(readFileSync(f, "utf8")); } catch { return ""; } });
 }
 
 function runDiscover(argv) {
@@ -254,6 +269,7 @@ function runDiscover(argv) {
   const samples = get("--samples"), baseline = get("--baseline");
   const json = argv.includes("--json");
   const top = Number(get("--top")) || 30;
+  const minDocs = Number(get("--min-docs")) || 3;
   if (!samples || !baseline) {
     console.error("discover: need --samples <dir> and --baseline <dir>.\n" +
       "  node slop-lint.mjs --discover --samples corpus/samples --baseline corpus/baseline");
@@ -263,11 +279,11 @@ function runDiscover(argv) {
   // a human baseline or against the pool of other models (topic held constant).
   const sTexts = readAll(samples.split(",")), bTexts = readAll(baseline.split(","));
   if (!sTexts.length || !bTexts.length) { console.error("discover: empty samples or baseline corpus."); return 2; }
-  const cands = discover(sTexts, bTexts, { top });
+  const cands = discover(sTexts, bTexts, { top, minDocs });
   if (json) { console.log(JSON.stringify({ version: VERSION, candidates: cands }, null, 2)); return 0; }
   console.log("Candidate tells (over-represented in samples vs baseline, not yet in the catalogue):\n");
-  console.log("  ratio   count  token");
-  for (const c of cands) console.log(`  ${c.ratio.toFixed(1).padStart(6)}  ${String(c.count).padStart(5)}  ${c.token}`);
+  console.log("  ratio   count  docs  token");
+  for (const c of cands) console.log(`  ${c.ratio.toFixed(1).padStart(6)}  ${String(c.count).padStart(5)}  ${String(c.docs).padStart(4)}  ${c.token}`);
   console.log(`\n${cands.length} candidate(s). Review, then add the real tells to WORD_GROUPS (with a source) and CHANGELOG.md.`);
   return 0;
 }

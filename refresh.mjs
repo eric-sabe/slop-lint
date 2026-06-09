@@ -29,7 +29,7 @@ function readDir(dir) {
     for (const e of readdirSync(d)) {
       const p = join(d, e);
       if (statSync(p).isDirectory()) walk(p);
-      else if (/\.(md|markdown|mdx|txt)$/.test(e)) { try { out.push(readFileSync(p, "utf8")); } catch { /* skip */ } }
+      else if (/\.(md|markdown|mdx|txt)$/.test(e)) { try { out.push(readFileSync(p, "utf8").replace(/^﻿?---\r?\n[\s\S]*?\r?\n---\r?\n/, "")); } catch { /* skip */ } }
     }
   };
   walk(dir);
