@@ -2,7 +2,7 @@
 
 A tiny, zero-dependency linter that flags **AI slop** in prose: the **LLM writing tells** that make text read like a language model wrote it. It **fails on the em-dash** (the one near-decisive AI typographic tell) and **warns** on the words, cliches, and constructions that give it away.
 
-One file. No dependencies. No config. Node 18+.
+One file. No dependencies. No config required. Node 18+.
 
 ```
 $ npx github:eric-sabe/slop-lint posts/
@@ -58,6 +58,8 @@ node slop-lint.mjs --ext .md,.mdx src   # restrict which extensions to walk
 node slop-lint.mjs --ignore drafts .    # skip paths containing a substring (repeatable)
 node slop-lint.mjs --fail-on-warn .     # strict mode: exit 1 on warnings too
 node slop-lint.mjs --quiet .            # only print files that have hits
+node slop-lint.mjs --allow tapestry .   # permit a word/phrase for this run (repeatable)
+node slop-lint.mjs --config team.json . # read the allow list from an explicit file
 git ls-files '*.md' | xargs node slop-lint.mjs   # only tracked markdown
 ```
 
@@ -69,6 +71,8 @@ git ls-files '*.md' | xargs node slop-lint.mjs   # only tracked markdown
 | `--ignore <substr>` | Skip any path containing this substring. Repeatable. |
 | `--fail-on-warn` | Exit 1 on warnings as well as em-dashes. |
 | `--quiet` | Only print files that have hits. |
+| `--allow <word/phrase>` | Permit a word or phrase for this run. Repeatable; stacks with the config file. |
+| `--config <file>` | Read the allow list from this file instead of `.slop-lint.json`. |
 | `--list` | Print the catalogue grouped by source. |
 | `--version` | Print the catalogue version. |
 | `--help` | Usage. |
@@ -79,6 +83,25 @@ Directories are walked with the extension filter and skip `node_modules .git dis
 
 - `0` clean (or warnings only, without `--fail-on-warn`).
 - `1` at least one em-dash (or any warning under `--fail-on-warn`).
+- `2` bad invocation or a broken config file.
+
+## Allow list
+
+Some content legitimately needs a catalogued word or phrase: a product named Tapestry, API docs that must say "robust", a post that really does take a deep dive. Put those in a `.slop-lint.json` next to where you run the tool (it is picked up automatically):
+
+```json
+{
+  "allow": ["tapestry", "robust", "deep dive"]
+}
+```
+
+How it matches: each entry is a word or phrase written as it would appear in prose, and it disables every word/phrase rule that entry triggers, case-insensitively. So you can paste the flagged text from the report verbatim, and an entry like `"rich cultural tapestry"` silences both the phrase pattern and the word `tapestry` inside it. Matching is per catalogue entry: allowing `delve` leaves `delves` and `delving` flagged.
+
+Notes:
+
+- `--config <file>` reads the allow list from an explicit path instead (the default file is then ignored); `--allow <entry>` adds one-off entries on top and is repeatable.
+- The typographic tells (em-dash, `--`, smart quotes, emoji) are never suppressed. The em-dash stays a hard failure; that is the point of the tool.
+- A missing `.slop-lint.json` is fine (zero-config stays the default); a present-but-broken one stops the run with exit code 2 rather than silently linting without it.
 
 ## In CI (GitHub Actions)
 
@@ -100,18 +123,22 @@ jobs:
 The file exports its internals, so you can build on it:
 
 ```js
-import { lintText, WORDS, PHRASES } from "slop-lint";
+import { lintText, readConfig, WORDS, PHRASES } from "slop-lint";
 
 const { em, hits } = lintText("In today's fast-paced world we leverage synergy.");
 // em   -> number of em-dashes (the failure)
 // hits -> array of formatted report lines (warnings and failures)
+
+lintText("We leverage synergy.", { allow: ["leverage"] });   // allow-list aware
+readConfig(".slop-lint.json");                               // -> { allow: [...] }, throws if broken
 ```
 
 ## What it flags
 
 - **Em-dash** (U+2014): failure.
 - **~100 focal and marketing words**: delve, intricate, meticulous, pivotal, tapestry, realm, testament, leverage, synergy, robust, seamless, holistic, empower, harness, unleash, landscape, journey, ecosystem, bolster, groundbreaking, renowned, innovative, streamline, actionable, and friends.
-- **~45 phrases and constructions**: "in today's ... world", "plays a crucial role", "it's worth noting that", "let's dive in", "in conclusion", "as an AI language model", "rich cultural heritage", "a diverse array of", "not just X but Y", "it's not X, it's Y", and more.
+- **~60 phrases and constructions**: "in today's ... world", "plays a crucial role", "it's worth noting that", "let's dive in", "in conclusion", "as an AI language model", "rich cultural heritage", "a diverse array of", "not just X but Y", "it's not X, it's Y", and more.
+- **Reply-bot rhetoric** (structural tells common in AI-generated social comment replies): validate-then-restate openers ("That is/That's the distinction.", "what you're describing", "you're right that", "a sharp addition"), contrast machinery (the uncontracted "The danger isn't the X. It is the Y.", "doesn't X, it just Y", the "can X ... can't X" modal antithesis), and standalone aphorism molds ("is what keeps A from becoming B", "is measured by how", "as a hypothesis, not a promise", "lowers X without lowering Y", "nobody polices X, they police Y").
 - **Double hyphen** used as an em-dash substitute, **smart/curly quotes** (a generator/word-processor tell), and **emoji**.
 
 The catalogue draws on corpus studies (the FSU "delve" focal-word analysis, a PubMed 135-term study, Gray's "meticulously commendable") plus published Pangram / Grammarly / practitioner blacklists. Tune `WORDS` and `PHRASES` at the top of `slop-lint.mjs` to taste.
@@ -137,6 +164,7 @@ Tells are a moving target: each model family brings new ones, and old ones fade 
 
   Set the model versions in `.env` (`XAI_MODEL`, `ANTHROPIC_MODEL`, etc.; copy `.env.example`) and just bump them there when a new model ships - no code or tracked-config edits. See [`corpus/README.md`](corpus/README.md).
 - **Build the human baseline** with `npm run baseline` (`build-baseline.mjs`): pulls modern, permissively-licensed prose across three registers into `corpus/baseline/` - US presidential addresses (public domain, oratory), NIH MedlinePlus health summaries (public domain, plain explainer), and Wikinews (CC BY, journalism). The strongest baseline is a large body of your own trusted contemporary prose; this is a reproducible starter. (Note: vs-human is only as good as the baseline, so cross-model stays the more reliable read.)
+- **Grow the structural rules from specimens.** Word-frequency discovery cannot see the reply-register tells (aphorism molds, validate-then-restate openers), so those are collected as specimens in [`corpus/specimens/`](corpus/specimens/) and turned into `PHRASES` rules by hand: draft the narrowest regex that captures the shape (function words and echoes, not content words), screen it against `corpus/baseline` to zero false positives, and require two independent sightings before it ships - one-sighting molds wait in [`PENDING.md`](corpus/specimens/PENDING.md). `npm run specimens` reports which specimen lines the catalogue trips on and which are uncaught; `npm run specimens -- <harvest.txt>` triages freshly harvested comment text the same way and flags second sightings of pending molds. See [`corpus/specimens/README.md`](corpus/specimens/README.md).
 - **Measure typography** with `npm run stats` (`corpus-stats.mjs`): em-dash, smart-quote, semicolon, ellipsis, and bold rates per model - the typographic tells the word-based `--discover` can't see (GPT/Grok emit ~9 curly quotes per 1k words; Claude none). One caveat it surfaced: literary/typeset human prose also em-dashes heavily, so the em-dash is a tell of *plain modern typed text* (posts, email, markdown), which is what slop-lint targets - not of prose in general.
 - **A monthly sweep does this for you.** `.github/workflows/catalogue-refresh.yml` runs `refresh.mjs` on a schedule, with no secrets: it combines corpus discovery with a coverage diff against the public Wikipedia "Signs of AI writing" essay, and files the candidates as a GitHub issue to review.
 

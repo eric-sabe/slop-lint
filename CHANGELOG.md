@@ -4,6 +4,61 @@ Notable changes to the slop-lint tool and its tell catalogue. Format roughly fol
 [Keep a Changelog](https://keepachangelog.com/); the package version and the catalogue
 version move together.
 
+## [0.9.0]
+
+### Added
+
+- **Allow-list config file.** Some content legitimately needs a catalogued word or phrase
+  (a product named Tapestry, docs that must say "robust"). A `.slop-lint.json` in the
+  working directory - `{ "allow": ["tapestry", "robust", "deep dive"] }` - is read
+  automatically; `--config <file>` reads an explicit path instead, and a repeatable
+  `--allow <entry>` flag adds one-offs on top. Each entry is written as it would appear
+  in prose and disables every word/phrase rule its text triggers (case-insensitive), so
+  flagged text can be pasted verbatim. Matching is per catalogue entry: allowing "delve"
+  leaves "delves"/"delving" flagged. The typographic tells (em-dash, `--`, smart quotes,
+  emoji) are never suppressed. A broken config stops the run with exit code 2; a missing
+  one is fine, so zero-config stays the default. Programmatic: `lintText(text, { allow })`
+  and a new `readConfig(path)` export.
+- **23 structural phrase rules for AI comment-reply rhetoric.** Sourced from reply-bot
+  specimens collected off social comment threads (two passes: pasted specimens, then a
+  live feed-mining session), where the tells are constructions, not vocabulary.
+  Validate-then-restate openers ("That is/That's the distinction.", "what you're
+  describing / what you described", "you're right that", the "a sharp addition/point"
+  compliment-open); contrast machinery (the uncontracted negated contrast "The danger
+  isn't the X. It is the Y.", the noun-subject "X isn't the A, it's B", "doesn't X, it
+  just Y", the "can X ... can't X" modal antithesis with a verb-echo backreference,
+  "the real question/test" pivot, the "a tech problem, a change-management one" echo);
+  aphorism molds ("is what keeps A from becoming B", "is measured by how", "as a
+  hypothesis, not a promise", "lowers X without lowering Y", "True X requires/lies in",
+  "the most important form of", "the uncomfortable question/truth", "will be those who"
+  superlative prediction, "as an X rather than a Y" reframe); plus the "Which
+  means/might" fragment opener, clause-initial "worth noting", and corrective anaphora
+  with a verb echo ("nobody polices X, they police Y" / "don't mark X, they mark Y").
+  Also widened 0.1.0's "not just X, but Y" to the "don't/doesn't just" forms, and added
+  the words "resonated"/"resonating" (the "this really resonated" validate-open;
+  inflection completion of 0.1.0's "resonate").
+- **The specimen corpus and mold workflow.** New `corpus/specimens/` holds the
+  reply-register specimens (as content-swapped skeletons: structure kept word-for-word,
+  topic nouns replaced), `npm run specimens` (`specimen-coverage.mjs`) reports which lines
+  the catalogue trips on and which are uncaught, and one-sighting molds wait in
+  `corpus/specimens/PENDING.md` behind a two-independent-sightings bar (the
+  document-frequency floor, applied by hand). Triage mode
+  (`npm run specimens -- <harvest.txt>`) is the mining step: point it at freshly
+  harvested comment text and it reports catalogue hits, pending-mold second sightings
+  (via the `PENDING_MOLDS` mirror of PENDING.md), and uncaught candidate lines. In its
+  first live run over a 21-comment feed thread it caught 11 of 28 lines and confirmed
+  three shipped rules against unseen data ("you're describing" fired on its third
+  independent thread). Every rule was screened against
+  `corpus/baseline` to 0 false positives across ~60k words of oratory/explainer/
+  journalism; the screen earned its keep twice - a loose negated-contrast draft fired on
+  presidential speeches at the same rate as on model output (fixed by requiring an
+  article after the negation, which also spares docs prose like "this field is not
+  required. It is optional"), and a loose can/can't draft hit a MedlinePlus conditional
+  ("If you cannot get...", fixed by excluding subordinators). Two rules are corroborated
+  in `corpus/samples` ("Kyoto is not just a checklist of temples. It is a place...";
+  "That's the promise we pour into every cup."). Specimen coverage: 15 of 16 lines
+  flagged; a coverage-floor test guards against rule regressions.
+
 ## [0.8.0]
 
 ### Changed
