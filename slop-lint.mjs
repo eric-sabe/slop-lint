@@ -12,6 +12,8 @@
  *   node slop-lint.mjs --ignore drafts      # skip paths containing a substring (repeatable)
  *   node slop-lint.mjs --fail-on-warn .     # exit 1 on warnings too (strict CI mode)
  *   node slop-lint.mjs --quiet .            # only print files that have hits
+ *   node slop-lint.mjs --allow tapestry .   # permit a word/phrase for this run (repeatable)
+ *   node slop-lint.mjs --config team.json . # read the allow list from an explicit file
  *   node slop-lint.mjs --version            # print the catalogue version
  *   node slop-lint.mjs --list               # print the catalogue with its sources
  *   git ls-files '*.md' | xargs node slop-lint.mjs     # lint tracked markdown
@@ -20,17 +22,24 @@
  * the catalogue is sourced and versioned (see CHANGELOG.md). Find candidate new tells
  * empirically with --discover (see below).
  *
+ * Allow list (optional): some content legitimately needs a catalogued word or phrase
+ * (a product named Tapestry, a doc that must say "robust"). Put those in a
+ * `.slop-lint.json` next to where you run the tool: { "allow": ["tapestry", "robust"] }.
+ * Each entry disables every word/phrase rule its text triggers, so you can paste the
+ * flagged text verbatim. Typographic tells (em-dash, "--", smart quotes, emoji) are
+ * never suppressed.
+ *
  * Severity, deliberately conservative (these words also appear in good human
  * writing, so false positives are the main risk and almost everything is a warning):
  *   FAIL (exit 1): the em-dash character (U+2014). The one near-decisive typographic tell.
  *   WARN:          everything else, flagged for a human look, never auto-removed.
  */
 
-import { readFileSync, readdirSync, statSync } from "node:fs";
+import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
 import { join, sep, extname } from "node:path";
 import { pathToFileURL } from "node:url";
 
-export const VERSION = "0.6.0";
+export const VERSION = "0.9.0";
 
 // Catalogue, grouped by provenance. Each group carries the version it was added in
 // and its source, so the list can be pruned with confidence as tells fade. Edit a
@@ -95,6 +104,13 @@ export const WORD_GROUPS = [
     source: "empirical: cross-model corpus discovery (--discover)",
     words: ["incredibly"],
   },
+  {
+    // Inflection completion: 0.1.0 has resonate/resonates, but the reply-register
+    // validate-open is past tense ("this really resonated").
+    since: "0.9.0",
+    source: "empirical: reply-bot specimens (validate-open 'this really resonated')",
+    words: ["resonated", "resonating"],
+  },
 ];
 
 // Flat list for matching (derived from the sourced groups above).
@@ -145,7 +161,7 @@ export const PHRASES = [
   { re: /\bonly time will tell\b/i, msg: '"only time will tell"' },
   { re: /\bthe journey (is just beginning|doesn'?t end here)\b/i, msg: '"the journey is just beginning"' },
   // syntactic constructions
-  { re: /\bnot (just|only)\b[^.?!]{0,60}\b(but|it'?s|they'?re|its)\b/i, msg: '"not just X, but Y"' },
+  { re: /\b(not|don'?t|doesn'?t|didn'?t) (just|only)\b[^.?!]{0,60}\b(but|it'?s|they'?re|its)\b/i, msg: '"not just X, but Y"' },
   { re: /\b(it'?s|we'?re|they'?re)\s+(not|never)(\s+just)?\b[^.?!]{1,80}?\b(it'?s|we'?re|they'?re)\b/i, msg: '"it\'s not X, it\'s Y" negated contrast' },
   // added 0.3.0 — Wikipedia: Signs of AI writing (assistant leakage + high-signal cliches)
   { re: /\bas an? (ai|large) language model\b/i, msg: '"as an AI/large language model" (assistant leakage)' },
@@ -158,6 +174,38 @@ export const PHRASES = [
   { re: /\bindelible mark\b/i, msg: '"indelible mark"' },
   { re: /\bdeeply rooted in\b/i, msg: '"deeply rooted in"' },
   { re: /\brich (cultural )?(tapestry|heritage)\b/i, msg: '"rich cultural heritage/tapestry"' },
+  // added 0.9.0 — empirical: AI comment-reply rhetoric, sourced from reply-bot specimens
+  // collected off social threads. The reply register favors validate-then-restate openers
+  // and standalone aphorism molds that long-form corpus discovery can't see. Every rule
+  // was FP-screened against corpus/baseline (0 hits across ~60k words of human oratory /
+  // explainer / journalism); the uncontracted negated contrast is also corroborated in
+  // corpus/samples (model long-form output). The two ^ anchors mean "starts the line",
+  // which in social text is the start of the reply.
+  { re: /^\s*that('?s| is) the [^.?!]{1,40}\.(\s|$)/i, msg: 'validate-then-restate opener ("That is/That\'s the ...")' },
+  { re: /\b(you'?re describing|what you (just )?described)\b/i, msg: 'validate-then-restate ("what you\'re describing")' },
+  { re: /\byou'?re (absolutely right|right that)\b/i, msg: 'concessive validation ("you\'re right that ...")' },
+  { re: /\b(such )?a sharp (addition|point|observation|framing|distinction|question|way)\b/i, msg: '"a sharp addition/point" compliment-open' },
+  { re: /^[^.?!]{1,45}\b(isn'?t|is not|aren'?t|are not) (the|an?|about|just)\b[^.?!]{1,100}[.?!]\s+it(?:'?s| is)\b/i, msg: '"A isn\'t the X. It is the Y." negated contrast (uncontracted)' },
+  { re: /\b(doesn'?t|does not) [^.?!]{1,60}, it (just|only|simply|actually)\b/i, msg: '"doesn\'t X, it just Y" contrast' },
+  { re: /\bcan (\w{3,})\b[^.?!]{0,80}[.?!]\s+(?!if |when |unless )(?:\w+ ){0,2}can(?:'t|not)\b (?:\w+ )?\1\b/i, msg: '"can X ... can\'t X" modal antithesis (verb echo)' },
+  { re: /\bthe real (open )?(question|test) (of|is|isn'?t|will be)\b/i, msg: '"the real question/test" pivot' },
+  { re: /^\s*which (means|might|may|is why|is where|is what)\b/i, msg: '"Which means/might ..." fragment opener' },
+  { re: /(^|[.?!]\s+)worth noting\b/i, msg: 'hedge: "worth noting ..." (clause-initial)' },
+  { re: /\bthe (uncomfortable|deeper|harder|honest|quiet) (question|truth|answer|reality|tension)\b/i, msg: '"the uncomfortable question/truth" framing' },
+  { re: /\bthe most (important|powerful|dangerous) form of\b/i, msg: '"the most important form of X" hedged superlative' },
+  { re: /\bis what keeps [^.?!]{1,50}from (becoming|turning into)\b/i, msg: '"X is what keeps A from becoming B" aphorism mold' },
+  { re: /\bis measured by how\b/i, msg: '"is measured by how" aphorism mold' },
+  { re: /\b(\w{3,}?)e?s\b[^.?!]{1,50}\bwithout \1ing\b/i, msg: '"lowers X without lowering Y" parallel antithesis' },
+  { re: /\bas an? \w+, not an? \w+[.!]/i, msg: '"as a hypothesis, not a promise" antithesis close' },
+  { re: /\bnobody (\w{3,}?)e?s\b[^.?!]{1,60}\bthey \1/i, msg: 'corrective anaphora ("nobody polices X, they police Y")' },
+  // Second collection pass (feed mining, 2026-07): same screen, two independent
+  // sightings each. "as ... rather than" is also corroborated in corpus/samples (4 hits).
+  { re: /\b\w+ isn'?t (really )?(the|an?) [^.?!]{1,60}, it'?s\b/i, msg: '"X isn\'t the A, it\'s B" negated contrast (noun subject)' },
+  { re: /\b(will|are going to) be (those|the ones) who\b/i, msg: '"will be those who ..." superlative prediction' },
+  { re: /\bas an? [\w-]+( [\w-]+){0,3} rather than an?\b/i, msg: '"as an X rather than a Y" reframe' },
+  { re: /\ban? [\w-]+( [\w-]+)? (problem|failure|issue|question)\b[^.?!]{0,40}\ban? [\w-]+( [\w-]+)? one\b/i, msg: '"a tech problem, a change-management one" echo' },
+  { re: /\btrue \w+ (requires|lies in|demands|means)\b/i, msg: '"True X requires/lies in ..." aphorism open' },
+  { re: /\b(don'?t|doesn'?t) (\w{3,})\b[^.?!]{1,60},\s*(they|it|we) \2/i, msg: 'corrective anaphora ("don\'t mark X, they mark Y")' },
 ];
 
 export const EMOJI = /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{2190}-\u{21FF}\u{2B00}-\u{2BFF}]/u;
@@ -167,10 +215,34 @@ const reWord = (w) => new RegExp(`\\b${w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}
 
 const DEFAULT_EXTS = [".md", ".markdown", ".mdx", ".txt"];
 const IGNORE_DIRS = new Set(["node_modules", ".git", "dist", "build", ".next", "out", "vendor", "coverage"]);
+const DEFAULT_CONFIG = ".slop-lint.json";
+
+// Read an allow-list config file: { "allow": ["word or phrase", ...] }.
+// Throws (with the path in the message) on unreadable, unparsable, or malformed content;
+// a broken config should stop the run, not silently lint without it.
+export function readConfig(path) {
+  let raw;
+  try { raw = readFileSync(path, "utf8"); } catch (e) { throw new Error(`config ${path}: ${e.message}`); }
+  let cfg;
+  try { cfg = JSON.parse(raw); } catch (e) { throw new Error(`config ${path}: invalid JSON (${e.message})`); }
+  const allow = cfg.allow ?? [];
+  if (!Array.isArray(allow) || allow.some((a) => typeof a !== "string" || !a.trim())) {
+    throw new Error(`config ${path}: "allow" must be an array of non-empty strings`);
+  }
+  return { allow };
+}
 
 // Lint one document. Returns { em, hits } where em is the em-dash count (the only
 // failure) and hits are preformatted "  <line>: <symbol> ..." report lines.
-export function lintText(text) {
+// Each `allow` entry is a word or phrase as it would appear in prose; it disables every
+// word/phrase rule its text triggers (case-insensitive), so flagged text can be pasted
+// verbatim. Typographic tells (em-dash, "--", smart quotes, emoji) are never suppressed.
+export function lintText(text, { allow = [] } = {}) {
+  const okWords = new Set(), okPhrases = new Set();
+  for (const a of allow) {
+    for (const w of WORDS) if (reWord(w).test(a)) okWords.add(w);
+    for (const p of PHRASES) if (p.re.test(a)) okPhrases.add(p);
+  }
   let em = 0;
   const hits = [];
   text.split("\n").forEach((line, i) => {
@@ -178,8 +250,8 @@ export function lintText(text) {
     const dash = (line.match(/—/g) || []).length;
     if (dash) { em += dash; hits.push(`  ${n}: ✗ em-dash ×${dash}  ${line.trim().slice(0, 64)}`); }
     if (DOUBLEDASH.test(line)) hits.push(`  ${n}: ⚠ "--" (em-dash approximation)`);
-    for (const w of WORDS) if (reWord(w).test(line)) hits.push(`  ${n}: ⚠ word "${w}"`);
-    for (const p of PHRASES) if (p.re.test(line)) hits.push(`  ${n}: ⚠ ${p.msg}`);
+    for (const w of WORDS) if (!okWords.has(w) && reWord(w).test(line)) hits.push(`  ${n}: ⚠ word "${w}"`);
+    for (const p of PHRASES) if (!okPhrases.has(p) && p.re.test(line)) hits.push(`  ${n}: ⚠ ${p.msg}`);
     if (SMARTQUOTE.test(line)) hits.push(`  ${n}: ⚠ smart/curly quote`);
     if (EMOJI.test(line)) hits.push(`  ${n}: ⚠ emoji`);
   });
@@ -299,29 +371,37 @@ function main(argv) {
     return 0;
   }
   const paths = [];
-  let exts = DEFAULT_EXTS, ignore = [], failOnWarn = false, quiet = false;
+  let exts = DEFAULT_EXTS, ignore = [], failOnWarn = false, quiet = false, configPath = null, allow = [];
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === "--help" || a === "-h") {
       console.log("slop-lint - flag LLM tells in prose. FAIL on em-dash, WARN on the rest.\n" +
         "  node slop-lint.mjs [paths...] [--ext .md,.txt] [--ignore <substr>]... [--fail-on-warn] [--quiet]\n" +
+        "                     [--allow <word/phrase>]... [--config <file>]\n" +
         "  node slop-lint.mjs --discover --samples <dir> --baseline <dir> [--top N] [--json]\n" +
-        "  --version  --list   (no paths: scans the current directory recursively)");
+        "  --version  --list   (no paths: scans the current directory recursively)\n" +
+        `  Allow list: ${DEFAULT_CONFIG} in the cwd ({"allow": ["word or phrase", ...]}) is read automatically.`);
       return 0;
     }
     if (a === "--ext") { exts = argv[++i].split(",").map((e) => (e.startsWith(".") ? e : `.${e}`).toLowerCase()); continue; }
     if (a === "--ignore") { ignore.push(argv[++i]); continue; }
     if (a === "--fail-on-warn") { failOnWarn = true; continue; }
     if (a === "--quiet") { quiet = true; continue; }
+    if (a === "--allow") { allow.push(argv[++i]); continue; }
+    if (a === "--config") { configPath = argv[++i]; continue; }
     paths.push(a);
   }
+  try {
+    if (configPath) allow.push(...readConfig(configPath).allow);
+    else if (existsSync(DEFAULT_CONFIG)) allow.push(...readConfig(DEFAULT_CONFIG).allow);
+  } catch (e) { console.error(`slop-lint: ${e.message}`); return 2; }
   const files = walkFiles(paths.length ? paths : ["."], { exts, ignore });
   if (!files.length) { console.log("slop-lint: no files found."); return 0; }
 
   let emTotal = 0, warnTotal = 0;
   for (const file of files) {
     let text; try { text = readFileSync(file, "utf8"); } catch (e) { console.log(`skip ${file}: ${e.message}`); continue; }
-    const { em, hits } = lintText(text);
+    const { em, hits } = lintText(text, { allow });
     emTotal += em; warnTotal += hits.filter((h) => h.includes("⚠")).length;
     if (hits.length || !quiet) console.log(`\n${file}\n${hits.length ? hits.join("\n") : "  clean ✓"}`);
   }
