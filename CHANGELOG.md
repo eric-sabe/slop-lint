@@ -4,6 +4,22 @@ Notable changes to the slop-lint tool and its tell catalogue. Format roughly fol
 [Keep a Changelog](https://keepachangelog.com/); the package version and the catalogue
 version move together.
 
+## [0.9.1]
+
+### Fixed
+
+- **CLI now runs under `npx` and any `bin` symlink.** The direct-invocation guard
+  compared `import.meta.url` against `process.argv[1]` verbatim. When Node launches the
+  tool through a symlink - which is how `npx slop-lint`, `npx github:eric-sabe/slop-lint`,
+  and a package `bin` install (`node_modules/.bin/slop-lint`) all run it - `argv[1]` is
+  the symlink path, so the comparison failed, `main` never ran, and the process printed
+  nothing and exited 0 (a file with an em-dash passed). The guard now resolves `argv[1]`
+  with `realpathSync` before comparing, so the CLI runs whether invoked directly or
+  through a link. A test invokes the CLI through a symlink on a temp file with an em-dash
+  and asserts exit code 1. The `exports`-based `import` path is unaffected.
+- **Reconciled the package version with the catalogue version.** `package.json` was still
+  `0.8.0` while the CLI reported `0.9.0`; both now move together at `0.9.1`.
+
 ## [0.9.0]
 
 ### Added

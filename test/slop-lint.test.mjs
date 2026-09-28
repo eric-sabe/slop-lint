@@ -1,9 +1,13 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync, writeFileSync, mkdtempSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdtempSync, symlinkSync } from "node:fs";
+import { execFileSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { lintText, walkFiles, discover, readConfig, WORDS, WORD_GROUPS, PHRASES, VERSION } from "../slop-lint.mjs";
+
+const CLI = fileURLToPath(new URL("../slop-lint.mjs", import.meta.url));
 
 test("em-dash is the one hard failure", () => {
   const { em, hits } = lintText("We shipped it — and it worked.");
@@ -226,6 +230,30 @@ test("catalogue is sourced: every group has since + source, and WORDS derives fr
 
 test("VERSION is a semver-ish string", () => {
   assert.match(VERSION, /^\d+\.\d+\.\d+$/);
+});
+
+test("VERSION matches the package.json version", () => {
+  const pkg = JSON.parse(readFileSync(fileURLToPath(new URL("../package.json", import.meta.url)), "utf8"));
+  assert.equal(VERSION, pkg.version);
+});
+
+test("CLI runs through a bin symlink (npx path) and fails on an em-dash", () => {
+  // npx and package `bin` installs launch the tool via a symlink; the direct-run
+  // guard must resolve argv[1] to its real path, or main never runs (exit 0, no output).
+  const dir = mkdtempSync(join(tmpdir(), "slop-lint-bin-"));
+  const target = join(dir, "sample.md");
+  writeFileSync(target, "We shipped it — and it worked.\n");
+  const link = join(dir, "slop-lint");
+  symlinkSync(CLI, link);
+  let code = 0, stdout = "";
+  try {
+    stdout = execFileSync(process.execPath, [link, target], { encoding: "utf8" });
+  } catch (e) {
+    code = e.status;
+    stdout = e.stdout ?? "";
+  }
+  assert.equal(code, 1, "symlinked CLI should exit 1 on an em-dash");
+  assert.match(stdout, /em-dash failure\(s\)/);
 });
 
 test("discover surfaces over-represented tokens and bigrams, excluding catalogue words", () => {

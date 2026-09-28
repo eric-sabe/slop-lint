@@ -35,11 +35,11 @@
  *   WARN:          everything else, flagged for a human look, never auto-removed.
  */
 
-import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
+import { readFileSync, readdirSync, statSync, existsSync, realpathSync } from "node:fs";
 import { join, sep, extname } from "node:path";
 import { pathToFileURL } from "node:url";
 
-export const VERSION = "0.9.0";
+export const VERSION = "0.9.1";
 
 // Catalogue, grouped by provenance. Each group carries the version it was added in
 // and its source, so the list can be pruned with confidence as tells fade. Edit a
@@ -411,6 +411,15 @@ function main(argv) {
 }
 
 // Run as a CLI when invoked directly; stay importable when required elsewhere.
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+// argv[1] may be a symlink (npx and package `bin` install a node_modules/.bin
+// shim), so resolve it to its real path before comparing against this module.
+function invokedAsCli() {
+  const entry = process.argv[1];
+  if (!entry) return false;
+  let real = entry;
+  try { real = realpathSync(entry); } catch { /* keep the raw path */ }
+  return import.meta.url === pathToFileURL(real).href;
+}
+if (invokedAsCli()) {
   process.exit(main(process.argv.slice(2)));
 }
