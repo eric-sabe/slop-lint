@@ -4,6 +4,34 @@ Notable changes to the slop-lint tool and its tell catalogue. Format roughly fol
 [Keep a Changelog](https://keepachangelog.com/); the package version and the catalogue
 version move together.
 
+## [0.10.0]
+
+### Added
+
+- **10 phrase rules from the 2026-11 catalogue refresh (issue #8).** Source: Wikipedia
+  "Signs of AI writing" (Words to watch); every candidate was re-verified against the
+  live page (2026-11-08) and FP-screened against `corpus/baseline` (0 hits across the
+  human reference prose). New tells cover assistant leakage ("as of my last knowledge
+  update", "in the provided sources/search results", "I cannot offer medical
+  advice"), the sentence-initial "Certainly! / Of course!" compliance opener, and
+  hedging or significance-inflation constructions ("based on available information",
+  "while specific details are limited", "does not by itself establish", "not widely
+  available/documented", "despite these challenges", "marks/represents a shift").
+
+### Reviewed and not added
+
+- **Corpus-discovery topic nouns** ("silk road", "Marie Curie", "bread", "coffee",
+  "jazz", "headphones", "blockchain", "remote work", ...): the over-representation
+  comes from the fixed prompt subjects, not from model register, so these would flag
+  human writing about those topics.
+- **Common words already rejected in the 0.3.0 pass** ("crucial", "overall",
+  "such as", "rich", "featuring", "align with"): the refresh tooling re-surfaces them
+  because they are absent from the catalogue; the rejection stands.
+- **Journalism weasel words** ("experts argue", "some critics argue", "observers
+  have cited", "several sources"): ordinary human reporting usage; too many false
+  positives even at warning severity.
+- No catalogue entries pruned: no evidence any existing tell has faded.
+
 ## [0.9.1]
 
 ### Fixed

@@ -54,6 +54,45 @@ test("word matching is case-insensitive and whole-word", () => {
   assert.equal(lintText("the leveraged buyout").hits.filter((h) => h.includes('word "leverage"')).length, 0);
 });
 
+test("flags assistant leakage and hedging (0.10.0 refresh)", () => {
+  assert.ok(lintText("As of my last knowledge update, the package supports ESM.").hits.some((h) => h.includes("assistant leakage")));
+  assert.ok(lintText("Up to my last training update, no fix existed.").hits.some((h) => h.includes("assistant leakage")));
+  assert.ok(lintText("Certainly! Here is the breakdown you asked for.").hits.some((h) => h.includes("assistant-compliance opener")));
+  assert.ok(lintText("I cannot offer medical advice, but I can summarise the leaflet.").hits.some((h) => h.includes("disclaimer leakage")));
+  assert.ok(lintText("Coverage is based on available information.").hits.some((h) => h.includes("available information")));
+  assert.ok(lintText("The figure appears in the provided sources.").hits.some((h) => h.includes("retrieval leakage")));
+  assert.ok(lintText("While specific details are limited, the outline is clear.").hits.some((h) => h.includes("details are limited")));
+  assert.ok(lintText("A passing mention does not by itself establish notability.").hits.some((h) => h.includes("notability hedge")));
+  assert.ok(lintText("The event is not widely documented outside local papers.").hits.some((h) => h.includes("not widely")));
+  assert.ok(lintText("Despite these challenges, the bakery kept its hours.").hits.some((h) => h.includes("despite these challenges")));
+  assert.ok(lintText("The ruling marks a shift in how the agency reads the statute.").hits.some((h) => h.includes("marks/represents a shift")));
+});
+
+test("allow list suppresses a 0.10.0 phrase rule verbatim", () => {
+  const flagged = lintText("Despite these challenges, the bakery kept its hours.");
+  assert.ok(flagged.hits.some((h) => h.includes("despite these challenges")));
+  const allowed = lintText("Despite these challenges, the bakery kept its hours.", { allow: ["despite these challenges"] });
+  assert.equal(allowed.hits.filter((h) => h.includes("despite these challenges")).length, 0);
+});
+
+test("CLI warns (exit 0) on assistant-leakage tells in a file", () => {
+  const dir = mkdtempSync(join(tmpdir(), "slop-lint-0100-"));
+  const target = join(dir, "draft.md");
+  writeFileSync(target, "As of my last knowledge update, the fix was merged.\nDespite these challenges, work continued.\n");
+  const stdout = execFileSync(process.execPath, [CLI, target], { encoding: "utf8" });
+  assert.ok(stdout.includes("assistant leakage"), "expected assistant-leakage warning");
+  assert.ok(stdout.includes("despite these challenges"), "expected transition warning");
+  assert.ok(stdout.includes("0 em-dash failure"), "warnings alone must not fail the run");
+});
+
+test("0.10.0 rules leave ordinary human usage clean", () => {
+  // no exclamation / not sentence-initial: plain adverbs, not the compliance opener
+  assert.equal(lintText("He was certainly right about the train times.").hits.length, 0);
+  assert.equal(lintText("Of course we went home early.").hits.length, 0);
+  // the opener only fires sentence-initially with the exclamation
+  assert.equal(lintText("We said certainly! is not something people write.").hits.filter((h) => h.includes("assistant-compliance")).length, 0);
+});
+
 test("flags validate-then-restate reply openers", () => {
   assert.ok(lintText("That is the distinction. Strong leaders learn from setbacks.").hits.some((h) => h.includes("validate-then-restate opener")));
   assert.ok(lintText("The lever you're describing is the interesting part.").hits.some((h) => h.includes("you're describing")));
