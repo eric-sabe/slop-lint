@@ -39,7 +39,7 @@ import { readFileSync, readdirSync, statSync, existsSync, realpathSync } from "n
 import { join, sep, extname } from "node:path";
 import { pathToFileURL } from "node:url";
 
-export const VERSION = "0.9.1";
+export const VERSION = "0.10.0";
 
 // Catalogue, grouped by provenance. Each group carries the version it was added in
 // and its source, so the list can be pruned with confidence as tells fade. Edit a
@@ -206,6 +206,25 @@ export const PHRASES = [
   { re: /\ban? [\w-]+( [\w-]+)? (problem|failure|issue|question)\b[^.?!]{0,40}\ban? [\w-]+( [\w-]+)? one\b/i, msg: '"a tech problem, a change-management one" echo' },
   { re: /\btrue \w+ (requires|lies in|demands|means)\b/i, msg: '"True X requires/lies in ..." aphorism open' },
   { re: /\b(don'?t|doesn'?t) (\w{3,})\b[^.?!]{1,60},\s*(they|it|we) \2/i, msg: 'corrective anaphora ("don\'t mark X, they mark Y")' },
+  // added 0.10.0 — catalogue refresh 2026-11 (issue #8), source: Wikipedia "Signs of AI
+  // writing" (Words to watch). Each candidate re-verified against the live page
+  // (2026-11-08) and FP-screened against corpus/baseline (0 hits). Assistant-leakage
+  // and hedging constructions. Rejected from the same candidate list: corpus-discovery
+  // topic nouns ("silk road", "Marie Curie", "bread", "coffee", "jazz", ...) are
+  // prompt-subject leakage, not register tells; common words ("crucial", "overall",
+  // "such as", "rich", "featuring", "align with") stay rejected per the 0.3.0 pass;
+  // journalism weasel words ("experts argue", "some critics argue") are ordinary
+  // human reporting. No catalogue entries pruned: no evidence any tell has faded.
+  { re: /\b(as of|up to) my last (knowledge|training) (update|cutoff)\b/i, msg: '"as of my last knowledge update" (assistant leakage)' },
+  { re: /(^|[.?!]\s+)(certainly|of course)!(?=\s|$)/i, msg: '"Certainly! / Of course!" assistant-compliance opener' },
+  { re: /\bi can(?:no|'?)t (offer|provide) (medical|legal|financial|professional) advice\b/i, msg: '"I cannot offer medical advice" (assistant disclaimer leakage)' },
+  { re: /\bbased on (the )?available information\b/i, msg: '"based on available information" hedge' },
+  { re: /\bin the (provided|available) (sources|search results)\b/i, msg: '"in the provided sources/search results" (retrieval leakage)' },
+  { re: /\bwhile (specific )?details (are|remain) (limited|scarce)\b/i, msg: '"while specific details are limited" hedge' },
+  { re: /\bdoes not (by itself|in itself|necessarily) establish\b/i, msg: '"does not by itself establish" notability hedge' },
+  { re: /\bnot widely (available|documented|disclosed|reported)\b/i, msg: '"not widely available/documented" hedge' },
+  { re: /\bdespite these challenges\b/i, msg: '"despite these challenges" transition' },
+  { re: /\b(represents|marks|reflects) a (broader |wider )?shift\b/i, msg: '"marks/represents a shift" significance inflation' },
 ];
 
 export const EMOJI = /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{2190}-\u{21FF}\u{2B00}-\u{2BFF}]/u;
