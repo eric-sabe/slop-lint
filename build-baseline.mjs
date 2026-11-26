@@ -24,7 +24,24 @@ import { writeFileSync, mkdirSync, rmSync } from "node:fs";
 const UA = "slop-lint-baseline-builder/3.0 (https://github.com/eric-sabe/slop-lint)";
 const wc = (t) => (t.match(/\S+/g) || []).length;
 const slug = (s) => String(s).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 50);
-const cap = (t, n) => t.split(/\s+/).filter(Boolean).slice(0, n).join(" ");
+// Paragraph model: a document is an array of paragraphs (each one a single line, inner
+// whitespace flattened). Files are written as paragraphs joined by a blank line ("\n\n"),
+// so paragraph/heading/list-run structure survives into the baseline.
+const BOILERPLATE = /^(from wikisource|wikisource\b|source:|retrieved from|this work is in the public domain|public domain\b|category:|navigation menu|jump to (navigation|search)|\[?(edit|hide|show)\]?$)/i;
+const toParas = (t) => String(t).replace(/\r/g, "").split(/\n/)
+  .map((l) => l.replace(/\s+/g, " ").trim()).filter((l) => l && !BOILERPLATE.test(l));
+// Cap at n words at paragraph granularity; the last paragraph is cut mid-way if needed.
+function capParas(paras, n) {
+  const out = []; let left = n;
+  for (const p of paras) {
+    if (left <= 0) break;
+    const w = p.split(" ");
+    if (w.length <= left) { out.push(p); left -= w.length; }
+    else { out.push(w.slice(0, left).join(" ")); break; }
+  }
+  return out;
+}
+const render = (paras) => paras.join("\n\n") + "\n";
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const fresh = (dir) => { rmSync(dir, { recursive: true, force: true }); mkdirSync(dir, { recursive: true }); };
 
@@ -49,7 +66,7 @@ async function speeches(maxWords = 2000) {
   ])];
   let n = 0;
   for (const t of titles) {
-    try { const x = await wsExtract(t); if (wc(x) >= 400) { writeFileSync(`${dir}/${slug(t)}.txt`, cap(x, maxWords) + "\n"); n++; } }
+    try { const x = await wsExtract(t); if (wc(x) >= 400) { writeFileSync(`${dir}/${slug(t)}.txt`, render(capParas(toParas(x), maxWords))); n++; } }
     catch (e) { console.log(`speech "${t}": ${e.message}`); }
     await sleep(150);
   }
@@ -60,10 +77,14 @@ async function speeches(maxWords = 2000) {
 const TERMS = ["diabetes", "asthma", "nutrition", "exercise", "sleep", "vaccines", "high blood pressure",
   "depression", "arthritis", "cholesterol", "pregnancy", "stroke", "obesity", "influenza", "anxiety",
   "allergies", "osteoporosis", "hepatitis", "migraine", "anemia"];
+// Decode the escaped-HTML payload, turn block-level tags into newlines, then strip the rest.
+// Returns text with "\n" at block boundaries (use toParas to split into paragraphs).
 function unhtml(s) {
-  return s.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/<[^>]+>/g, " ")
+  return s.replace(/&lt;/g, "<").replace(/&gt;/g, ">")
+    .replace(/<\/?(p|li|ul|ol|div|br|h[1-6]|tr|table|dl|dt|dd|blockquote)\b[^>]*>/gi, "\n")
+    .replace(/<[^>]+>/g, "")
     .replace(/&nbsp;/g, " ").replace(/&quot;/g, '"').replace(/&#0?39;|&rsquo;|&lsquo;/g, "'")
-    .replace(/&amp;/g, "&").replace(/\s+/g, " ").trim();
+    .replace(/&amp;/g, "&").replace(/[ \t\f\v]+/g, " ").replace(/ ?\n ?/g, "\n").trim();
 }
 async function medlineplus(maxWords = 1200) {
   const dir = "corpus/baseline/medlineplus"; fresh(dir);
@@ -72,11 +93,11 @@ async function medlineplus(maxWords = 1200) {
     try {
       const u = `https://wsearch.nlm.nih.gov/ws/query?db=healthTopics&term=${encodeURIComponent(term)}&retmax=1`;
       const xml = await (await fetch(u, { headers: { "User-Agent": UA } })).text();
-      const title = unhtml((xml.match(/<content name="title">([\s\S]*?)<\/content>/) || [])[1] || term);
-      const summary = unhtml((xml.match(/<content name="FullSummary">([\s\S]*?)<\/content>/) || [])[1] || "");
+      const title = toParas(unhtml((xml.match(/<content name="title">([\s\S]*?)<\/content>/) || [])[1] || term)).join(" ");
+      const summary = toParas(unhtml((xml.match(/<content name="FullSummary">([\s\S]*?)<\/content>/) || [])[1] || ""));
       const key = slug(title);
-      if (seen.has(key) || wc(summary) < 150) continue;
-      seen.add(key); writeFileSync(`${dir}/${key || slug(term)}.txt`, cap(summary, maxWords) + "\n"); n++;
+      if (seen.has(key) || wc(summary.join(" ")) < 150) continue;
+      seen.add(key); writeFileSync(`${dir}/${key || slug(term)}.txt`, render(capParas(summary, maxWords))); n++;
     } catch (e) { console.log(`medlineplus "${term}": ${e.message}`); }
     await sleep(200);
   }
@@ -97,7 +118,7 @@ async function wikinews(target = 22) {
         const ex = (p.extract || "").trim();
         if (seen.has(p.pageid) || wc(ex) < 180) continue;
         seen.add(p.pageid); n++;
-        writeFileSync(`${dir}/${String(n).padStart(2, "0")}-${slug(p.title)}.txt`, ex + "\n");
+        writeFileSync(`${dir}/${String(n).padStart(2, "0")}-${slug(p.title)}.txt`, render(toParas(ex)));
       }
     } catch (e) { console.log(`wikinews round ${round}: ${e.message}`); break; }
   }

@@ -5,7 +5,7 @@ import { execFileSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { lintText, walkFiles, discover, readConfig, WORDS, WORD_GROUPS, PHRASES, VERSION } from "../slop-lint.mjs";
+import { lintText, walkFiles, discover, readConfig, docRates, extractComments, splitSentences, WORDS, ALL_WORDS, WORD_GROUPS, PHRASE_GROUPS, PHRASES, ARTIFACTS, PROFILES, CODE_EXTS, VERSION } from "../slop-lint.mjs";
 
 const CLI = fileURLToPath(new URL("../slop-lint.mjs", import.meta.url));
 
@@ -223,9 +223,14 @@ test("catalogue is sourced: every group has since + source, and WORDS derives fr
   for (const g of WORD_GROUPS) {
     assert.ok(g.since && g.source && Array.isArray(g.words) && g.words.length);
   }
-  const flat = WORD_GROUPS.flatMap((g) => g.words);
-  assert.deepEqual(WORDS, flat);
-  assert.equal(new Set(WORDS).size, WORDS.length, "no duplicate words across groups");
+  assert.deepEqual(WORDS, WORD_GROUPS.filter((g) => !g.profile).flatMap((g) => g.words));
+  assert.deepEqual(ALL_WORDS, WORD_GROUPS.flatMap((g) => g.words));
+  assert.equal(new Set(ALL_WORDS).size, ALL_WORDS.length, "no duplicate words across groups");
+  for (const g of PHRASE_GROUPS) assert.ok(g.since && g.source && g.evidence && g.rules.length, `phrase group ${g.source}`);
+  for (const g of [...WORD_GROUPS, ...PHRASE_GROUPS]) {
+    if (g.profile) assert.ok(Object.hasOwn(PROFILES, g.profile), `unknown profile ${g.profile}`);
+    if (g.evidence) assert.match(g.evidence, /^(M1|M2|P|A)$/);
+  }
 });
 
 test("VERSION is a semver-ish string", () => {
@@ -292,4 +297,220 @@ test("prompts.json and models.json are valid and consistent", () => {
   assert.equal(new Set(ids).size, ids.length, "prompt ids are unique");
   assert.ok(p.prompts.every((x) => x.id && x.genre && x.prompt), "each prompt has id/genre/prompt");
   assert.ok(m.models.length && m.models.every((x) => x.id && x.provider && x.model && x.key), "each model has id/provider/model/key");
+});
+
+// ---- 0.10.0 ----------------------------------------------------------------
+
+const has = (text, tag, opts) => lintText(text, opts).hits.some((h) => h.includes(tag));
+const EM = String.fromCharCode(0x2014);
+
+test("inflections of catalogued stems are flagged; held forms are not", () => {
+  for (const w of ["delved", "fostering", "underscored", "harnessing", "showcased"]) {
+    assert.ok(has(`The team ${w} it.`, `word "${w}"`), w);
+  }
+  assert.equal(lintText("Blood pressure was elevated at the visit.").hits.length, 0);
+});
+
+test("2025-2026 staging moves are flagged", () => {
+  const cases = [
+    ["Let that sink in.", "let that sink in"],
+    ["Here's the kicker: nobody read it.", "kicker"],
+    ["We tried it. The result? Nothing changed.", "fragment question"],
+    ["The cache earns its keep on cold starts.", "earns its keep"],
+    ["That word is doing a lot of work here.", "doing a lot of work"],
+    ["Ship the fix. This matters.", "This matters."],
+    ["That's the whole point of the flag.", "whole point"],
+    ["Tests are not optional. Full stop.", "Full stop."],
+    ["Not a tool. Not a framework. A habit.", "countdown"],
+    ["The question isn't speed. The question is trust.", "noun-echo"],
+    ["The bottleneck is no longer the model. It is the review.", "is no longer X"],
+    ["The rollout went well, ensuring every team had access by Friday.", "participial tail"],
+    ["The rule is load-bearing and quietly useful.", 'word "load-bearing"'],
+  ];
+  for (const [t, tag] of cases) assert.ok(has(t, tag), `expected "${tag}" for: ${t}`);
+  // the countdown needs separate fragments, not an ordinary list sentence
+  assert.equal(lintText("Not hungry, not lonely, not in trouble, they still came.").hits.length, 0);
+});
+
+test("assistant leakage is flagged", () => {
+  assert.ok(has("Certainly! Here's the plan.", "assistant opener"));
+  assert.ok(has("As of my last knowledge update, the API was stable.", "knowledge-cutoff"));
+  assert.ok(has("Here is a revised version of your review.", "revision-request leakage"));
+});
+
+test("Wikipedia words-to-watch rules from PR #9 fire, and their near misses do not", () => {
+  assert.ok(has("Up to my last training cutoff, the rule stood.", "knowledge-cutoff"));
+  assert.ok(has("I cannot offer medical advice on this.", "advice disclaimer"));
+  assert.ok(has("I can't provide legal advice here.", "advice disclaimer"));
+  assert.ok(has("No record appears in the provided sources.", "retrieval leakage"));
+  assert.ok(has("Based on available information, the mill closed in 1902.", "available information"));
+  assert.ok(has("While specific details are limited, the firm grew.", "details are limited"));
+  assert.ok(has("This does not by itself establish notability.", "by itself establish", { profiles: ["wiki"] }));
+  assert.ok(!has("This does not by itself establish causation.", "by itself establish", { profiles: ["academic"] }));
+  assert.ok(has("Her early life is not widely documented.", "not widely documented"));
+  assert.ok(has("The law marks a broader shift in policy.", "broader shift"));
+  for (const ok of [
+    "The first two novels were not widely available in English.",
+    "A positive test does not necessarily establish infection.",
+    "The night shift starts at ten.",
+    "Details are in the appendix.",
+  ]) assert.equal(lintText(ok).hits.length, 0, ok);
+});
+
+test("machine artifacts fail and cannot be allowed", () => {
+  const t = "See [the docs](https://x.org/a?utm_source=chatgpt.com) and :contentReference[oaicite:2]{index=2}.";
+  const r = lintText(t, { allow: ["utm_source=chatgpt.com", "oaicite"] });
+  assert.equal(r.artifacts, 2);
+  assert.ok(r.hits.every((h) => h.includes("artifact")));
+  assert.equal(lintText("Sources [cite: 3, 4] and Regenerate response").artifacts, 2);
+  assert.equal(lintText("A plain link https://x.org/?utm_source=newsletter").artifacts, 0);
+  assert.ok(ARTIFACTS.length >= 6);
+});
+
+test("position-scoped closers only fire in the last two sentences", () => {
+  const end = "The deploy finished. Logs are in the bucket. Let me know if you'd like the raw output.";
+  assert.ok(has(end, "offer-of-help close"));
+  const mid = "Let me know if you'd like the raw output. The deploy finished. Logs are in the bucket. The run took four minutes.";
+  assert.ok(!has(mid, "offer-of-help close"));
+});
+
+test("profiles gate register groups", () => {
+  const t = "I hope this email finds you well. The review was laudable.";
+  assert.equal(lintText(t).hits.length, 0);
+  assert.ok(has(t, "I hope this email finds you well", { profiles: ["email"] }));
+  assert.ok(has(t, 'word "laudable"', { profiles: ["review"] }));
+  assert.ok(has("In recent years, edge caching has attracted increasing attention.", "centrality-claim", { profiles: ["academic"] }));
+  assert.ok(has("Prior work [3-9] studied this.", "citation clump", { profiles: ["academic"] }));
+});
+
+test("fenced code and inline code are skipped by word and phrase rules, not by the em-dash", () => {
+  const t = "Use `leverage` as the flag name.\n\n```\nwe leverage synergy\n```\n";
+  assert.equal(lintText(t).hits.length, 0);
+  const fenced = "```\na " + EM + " b\n```\n";
+  assert.equal(lintText(fenced).em, 1);
+});
+
+test("constructions split over a soft line break are caught once", () => {
+  const t = "The danger isn't the failure of the model.\nIt is the rigidity that follows.";
+  const hits = lintText(t).hits.filter((h) => h.includes("negated contrast (uncontracted)"));
+  assert.equal(hits.length, 1);
+  assert.ok(hits[0].includes("across lines"));
+});
+
+test("heading and list layout rules", () => {
+  const doc = "# Title\n\n## Getting Started Quickly\n\nText.\n\n## Advanced Usage Patterns\n\nText.\n\n## Key takeaways\n\nText.\n";
+  assert.ok(has(doc, "Title Case headings"));
+  assert.ok(has(doc, 'stock heading "Key takeaways"'));
+  const sentence = "# Title\n\n## Getting started\n\nText.\n\n## Advanced usage\n\nText.\n\n## Limits\n\nText.\n";
+  assert.equal(lintText(sentence).hits.length, 0);
+  const colon = "## Speed: the new moat\n\n## Cost: a hidden tax\n\n## Trust: what matters\n";
+  assert.ok(has(colon, "colon-subtitle headings"));
+  const bullets = "- **Speed**: fast.\n- **Cost**: low.\n- **Risk**: small.\n";
+  assert.ok(has(bullets, "bold lead-in bullets (3 in a row)"));
+  assert.ok(!has("- **Speed**: fast.\n- **Cost**: low.\n", "bold lead-in"));
+  const pr = "## Summary\n\nx\n\n## Changes\n\nx\n\n## Testing\n\nx\n\n## Motivation\n\nx\n";
+  assert.ok(has(pr, "PR template headings", { profiles: ["pr"] }));
+  assert.ok(!has(pr, "PR template headings"));
+});
+
+test("code mode lints comments only, ignoring comment markers inside strings", () => {
+  const src = 'const url = "http://example.com"; // here\'s the updated loader\nconst s = "// we leverage synergy";\n/* Step 1: parse */\n# not a comment in js\n';
+  const c = extractComments(src, CODE_EXTS[".ts"]);
+  assert.equal(c.split("\n").length, src.split("\n").length);
+  assert.ok(!c.includes("leverage"));
+  const r = lintText(src, { code: CODE_EXTS[".ts"], profiles: ["code"] });
+  assert.ok(r.hits.some((h) => h.startsWith("  1:") && h.includes("chat leakage")));
+  assert.ok(!r.hits.some((h) => h.includes("leverage")));
+  assert.ok(has("# This function was added to replace the old parser\nx = 1\n", "history narration", { code: CODE_EXTS[".py"], profiles: ["code"] }));
+  // code-comment rules never run on prose
+  assert.ok(!has("Step 1: install the tool.", "step narration"));
+});
+
+test("sentence splitter keeps common abbreviations together", () => {
+  assert.deepEqual(splitSentences("See e.g. the docs. Then run it. Dr. Lee agreed."), ["See e.g. the docs.", "Then run it.", "Dr. Lee agreed."]);
+});
+
+test("rate advisories need 15+ sentences and flag uniform, participial-heavy prose", () => {
+  assert.deepEqual(lintText("One short line. Another one.").advisories, []);
+  const uniform = Array.from({ length: 20 }, (_, i) => `The service handles request number ${i} cleanly, ensuring that every caller gets a reply.`).join(" ");
+  const r = lintText(uniform);
+  assert.ok(r.advisories.some((a) => a.includes("sentence lengths are uniform")));
+  assert.ok(r.advisories.some((a) => a.includes("participial clauses")));
+  assert.equal(r.em + r.artifacts, 0, "advisories never fail");
+  assert.deepEqual(lintText(uniform, { rates: false }).advisories, []);
+  const rates = docRates(uniform);
+  assert.equal(rates.sentences, 20);
+});
+
+test("false-positive screen: screened groups have zero hits on the human baseline", () => {
+  const files = walkFiles(["corpus/baseline"], { exts: [".txt"] });
+  assert.ok(files.length >= 40, "baseline present");
+  const screenedWords = WORD_GROUPS.filter((g) => g.screened).flatMap((g) => g.words);
+  const screenedRules = new Set(PHRASE_GROUPS.filter((g) => g.screened && !g.profile).flatMap((g) => g.rules.map((r) => r.msg)));
+  const offenders = [];
+  for (const f of files) {
+    for (const h of lintText(readFileSync(f, "utf8"), { rates: false }).hits) {
+      const msg = h.replace(/^\s*\d+: [^ ]+ /, "").replace(/ \(across lines\)$/, "");
+      const word = msg.match(/^word "(.+)"$/)?.[1];
+      if ((word && screenedWords.includes(word)) || screenedRules.has(msg)) offenders.push(`${f}: ${msg}`);
+    }
+  }
+  assert.deepEqual(offenders, []);
+});
+
+test("readConfig accepts known profiles and rejects unknown ones", () => {
+  const dir = mkdtempSync(join(tmpdir(), "slop-lint-"));
+  const good = join(dir, "p.json");
+  writeFileSync(good, JSON.stringify({ allow: [], profiles: ["pr", "email"] }));
+  assert.deepEqual(readConfig(good), { allow: [], profiles: ["pr", "email"] });
+  const bad = join(dir, "q.json");
+  writeFileSync(bad, JSON.stringify({ profiles: ["nope"] }));
+  assert.throws(() => readConfig(bad), /"profiles" must be/);
+});
+
+test("CLI: unknown profile is a bad invocation; artifacts fail the run", () => {
+  const dir = mkdtempSync(join(tmpdir(), "slop-lint-cli-"));
+  const f = join(dir, "a.md");
+  writeFileSync(f, "Read [this](https://x.org/?utm_source=chatgpt.com).\n");
+  const run = (args) => { try { execFileSync(process.execPath, [CLI, ...args], { encoding: "utf8" }); return 0; } catch (e) { return e.status; } };
+  assert.equal(run(["--profile", "nope", f]), 2);
+  assert.equal(run([f]), 1);
+});
+
+test("serious-writing skill: generated catalogue is current", () => {
+  execFileSync(process.execPath, [fileURLToPath(new URL("../build-skill.mjs", import.meta.url)), "--check"], { encoding: "utf8" });
+});
+
+test("serious-writing skill: tracks this catalogue version and lints clean under every profile", () => {
+  const skill = readFileSync("skills/serious-writing/SKILL.md", "utf8");
+  assert.ok(skill.includes(`catalogue ${VERSION}`), "SKILL.md names the current catalogue version; review the skill on every bump");
+  const all = Object.keys(PROFILES).filter((p) => p !== "code");
+  for (const f of walkFiles(["skills/serious-writing"])) {
+    const r = lintText(readFileSync(f, "utf8"), { profiles: all, rates: !f.endsWith("catalogue.md") });
+    assert.equal(r.em + r.artifacts, 0, `${f} fails`);
+    assert.deepEqual(r.hits, [], `${f} warns`);
+    assert.deepEqual(r.advisories, [], `${f} has advisories`);
+  }
+});
+
+test("code history rule skips version and deprecation notes", () => {
+  const py = '"""Dispatch.\n\n.. versionchanged:: 0.7\n   This code was moved to the new dispatcher.\n"""\n';
+  assert.ok(!has(py, "history narration", { code: CODE_EXTS[".py"], profiles: ["code"] }));
+  const go = "// GetRoute returns a route. This method\n// was renamed to Get() and remains for backwards compatibility.\n";
+  assert.ok(!has(go, "history narration", { code: CODE_EXTS[".go"], profiles: ["code"] }));
+  assert.ok(has("// This function was added to replace the old parser\n", "history narration", { code: CODE_EXTS[".ts"], profiles: ["code"] }));
+});
+
+test("config ignore list skips paths on directory walks", () => {
+  const dir = mkdtempSync(join(tmpdir(), "slop-lint-ign-"));
+  const cfg = join(dir, "c.json");
+  writeFileSync(cfg, JSON.stringify({ ignore: ["notes"] }));
+  assert.deepEqual(readConfig(cfg), { allow: [], ignore: ["notes"] });
+  const bad = join(dir, "b.json");
+  writeFileSync(bad, JSON.stringify({ ignore: [3] }));
+  assert.throws(() => readConfig(bad), /"ignore" must be/);
+  // the repo's own config keeps docs/research (which quotes tells) out of `slop-lint .`
+  assert.ok(readConfig(".slop-lint.json").ignore.includes("docs/research"));
+  const out = execFileSync(process.execPath, [CLI, "--quiet", "--no-rates", "docs"], { encoding: "utf8" });
+  assert.ok(!out.includes("docs/research"), "docs/research is skipped by the default config");
 });

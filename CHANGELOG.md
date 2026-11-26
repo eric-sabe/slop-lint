@@ -4,6 +4,130 @@ Notable changes to the slop-lint tool and its tell catalogue. Format roughly fol
 [Keep a Changelog](https://keepachangelog.com/); the package version and the catalogue
 version move together.
 
+## [0.10.0]
+
+Sourced from a five-track research pass (2026-11-25) over corpus studies, stylometry,
+academic-register studies, practitioner catalogues and writing-craft sources. The report
+and its notes are in `docs/research/`. The theme: vocabulary and typography change within
+a release cycle, while structure moves slowly, so this release spends most of its effort
+on scopes and rates.
+
+### Added
+
+- **Machine-artifact failures.** A new `ARTIFACTS` group fails the run (exit 1) and is
+  never suppressible: ChatGPT citation residue (content-reference and search-turn markers,
+  `attributableIndex`, the Private Use Area delimiters U+E200-E202 and U+EA01-EA02, run-together image markers), chatbot referral
+  parameters on links (`utm_source=chatgpt.com` and kin, `referrer=grok.com`), Gemini cite
+  and span markers, Grok citation cards, Perplexity upload paths, lenticular source
+  markers, and the chat UI's regenerate-button label. The bar is one documented sighting
+  plus zero baseline hits, because these are tokens nobody types, not style.
+- **110 words.** Inflections of catalogued stems that whole-word matching missed (25 are
+  on Kobak et al.'s excess-word list by name, such as `delved`, `underscored`, `fostering`,
+  `harnessing`, and are graded M1; the rest are graded like their stems; `elevated` is on
+  the list but held as routine clinical wording); measured excess vocabulary (`elucidate`,
+  `unveil`, `burgeoning`, `interplay`, `nuanced`, peer-review adverbs such as `aptly` and
+  `methodically`); the 2025-2026 staging vocabulary (`load-bearing`, 0.5 to 12.0 hits per
+  10k words across one user's Opus 4.6 and 4.7 sessions; `quietly`; `genuinely`); and opt-in groups
+  for reviews, PR text and fiction.
+- **75 phrase rules** (43 always on, 32 in profiles): assistant leakage and openers
+  (`Certainly!`, knowledge-cutoff and capability disclaimers, "Here is a revised
+  version"); offer-of-help closers scoped to the last two sentences; puffery ("a poignant reminder", "the complex interplay", "faced numerous challenges":
+  Pangram's February 2025 post puts five such phrases at 21,000x to 49,000x the human
+  rate, with no stated corpus; the "despite these challenges" and "focal point" forms
+  rest on Wikipedia); the 2025-2026 staging moves ("let that sink in",
+  "read that again", "here's the kicker", self-answered fragment questions, "Honestly?",
+  "earns its keep", "doing a lot of work", "This matters.", "that's the whole point",
+  "Full stop."); the rest of the negative-contrast family ("Not because X. Because Y.",
+  "Not X. Not Y. Z.", "The question isn't X. The question is Y.", "is no longer X. It is
+  Y." promoted from PENDING, "You're not X. You're Y."); the participial tail; stacked
+  hedges; and "experts argue" attribution.
+- **Wikipedia words-to-watch rules, contributed by @malcollmhollmes in #9** (issue #8):
+  advice disclaimers ("I cannot offer medical advice"), retrieval leakage ("in the
+  provided sources"), "based on available information", "while specific details are
+  limited", "not widely documented", "marks a broader shift", the "up to my last
+  training cutoff" form of the knowledge-cutoff rule, and "does not by itself establish"
+  in the `wiki` profile only (it stays held elsewhere; see below).
+  Screened here against the 2.3M-word register corpora; "not widely available" and
+  "does not necessarily establish" were dropped as ordinary English.
+- **Profiles** (`--profile`, or `"profiles"` in `.slop-lint.json`): `pr`, `email`,
+  `social`, `fiction`, `wiki`, `review`, `academic`, `code`. Register-bound tells live
+  there so they cost nothing elsewhere. "studies have shown" ships in `academic` only,
+  because MedlinePlus says it.
+- **Code-comment mode** (`--code` = `--profile code`): walks code files, lints only their
+  comment text (string literals are skipped), and adds comment rules for chat leakage,
+  step narration, history narration and placeholders.
+- **Layout rules**: stock headings, Title Case on 60%+ of 3+ subheadings, colon-subtitle
+  headings on 40%+, runs of 3+ bold lead-in bullets, and (with `pr`) 4+ PR template
+  headings.
+- **Cross-line matching**: phrase rules also run on each paragraph joined across soft line
+  breaks, reported once with "(across lines)". The uncontracted "A isn't the X. It is the
+  Y." rule now anchors at any sentence start inside a paragraph, not only at line start.
+- **Rate advisories** (`ℹ`, documents of 15+ sentences, never failing; `--no-rates` turns
+  them off): sentence-length variation, participial clauses, nominalization density,
+  tricolons, performed hedges, negative-contrast density, copula avoidance, bold density,
+  one-sentence-paragraph share and intensifier density. Thresholds were calibrated on 53
+  human baseline documents against 96 model answers so each sits at or beyond the human
+  extreme. On that corpus the advisories fire 3 times on human documents and 203 times on
+  model answers. `docRates()` and `RATE_THRESHOLDS` are exported; `npm run stats` now
+  prints the structural means.
+- **Metadata**: every group carries an evidence grade (M1, M2, P, A), and many carry an
+  era. `--list` prints them. Older tells are labelled, not deleted.
+- **The serious-writing skill** (`skills/serious-writing/`), which replaces the separate
+  no-ai-tells and serious-academic skills. Its `references/catalogue.md` is generated by
+  `npm run skill` (`build-skill.mjs`), and tests fail when it is stale, when the skill does
+  not name the current catalogue version, or when any skill file lints dirty.
+- U+202F narrow no-break space warning.
+- `"ignore"` in `.slop-lint.json`: path substrings skipped on directory walks, like
+  `--ignore`. The repo's own config ignores `docs/research` and `corpus/` (quoted tells and test
+  data), so `slop-lint .` at the repo root passes.
+
+### Changed
+
+- **Em-dash rationale.** The FAIL stays, as house style. The claim that it is the "one
+  near-decisive tell" is gone: Wikipedia now files it under historical indicators, and
+  The Economist (July 2026) found only Claude still uses more em-dashes than human
+  writers. The repo corpus agrees (Claude 7.4 and Grok 7.1 per 1k words, GPT 2.1, human
+  baseline 4.0).
+- **Fenced code blocks and inline code spans are skipped** by word, phrase and layout
+  rules, so a tell can be quoted in backticks. Typography and artifacts are still checked
+  everywhere.
+- **Baseline keeps paragraphs.** `build-baseline.mjs` writes blank-line-separated
+  paragraphs (speeches had been flattened to one line per file), so line-start,
+  paragraph and heading rules are screened against real structure. Groups marked
+  `screened` must have zero baseline hits, and a test enforces it.
+- `lintText` also returns `artifacts` and `advisories`; `WORDS` is now the always-on list
+  and `ALL_WORDS` includes profile groups. `PHRASES` remains a flat list, derived from
+  the new `PHRASE_GROUPS`.
+- `corpus-stats.mjs` no longer calls semicolons a generator signal: three of four model
+  samples use fewer than the human baseline.
+
+### Notes
+
+- Every 0.10.0 source was checked against its primary source after drafting
+  (`docs/research/2026-11-verification-*.md`: 88 verified, 32 partly right, 2
+  contradicted, 1 not found). The fixes are in this release: wider artifact and
+  revision-leakage regexes, the inflection group split by evidence, "frankly",
+  "commendably", "is the currency of" and a fiction phrase dropped for want of a
+  source, the review-profile group downgraded to anecdote, and corrected numbers in the
+  skill (the 4.85x overgeneralization figure compares against expert summaries, the
+  rebuttal-chain finding reverses in one of its two corpora).
+- A register screen against 2.4M words of pre-2023 human text (reviews, abstracts, PRs,
+  commits, code, Wikipedia, fiction, email; `build-registers.mjs`, `screen-registers.mjs`,
+  results in `docs/research/2026-11-register-screen.md`) held seven words that fire on
+  human text more than the established catalogue does, dropped the stacked-hedge warning,
+  trimmed the review and fiction profiles, and taught the code history rule to skip
+  version and deprecation notes. A rule may carry an `unless` pattern for such cases.
+- An email check against one maintainer's 2026 sent mail (aggregates only,
+  `docs/research/2026-11-email-baseline.md`) found no em-dashes, no email-profile hits,
+  and curly quotes that track the mail client, so the smart-quote warning now says it is
+  weak alone.
+- Held, with reasons in `corpus/specimens/PENDING.md`: bare "honestly", "frankly", "potent",
+  "amidst" and "unprecedented" (baseline hits), the GPT-5.6-era "does not by itself
+  establish" disclaimers outside `wiki` (they conflict with careful academic claim sizing), unlabelled
+  PR-corpus jargon, and five new one-source molds now mirrored in `PENDING_MOLDS`.
+- Measured evidence for 2025-2026 models is thin and mostly M2. No study retired any
+  entry, so nothing was deleted.
+
 ## [0.9.1]
 
 ### Fixed
