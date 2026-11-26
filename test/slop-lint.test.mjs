@@ -473,3 +473,11 @@ test("serious-writing skill: tracks this catalogue version and lints clean under
     assert.deepEqual(r.advisories, [], `${f} has advisories`);
   }
 });
+
+test("code history rule skips version and deprecation notes", () => {
+  const py = '"""Dispatch.\n\n.. versionchanged:: 0.7\n   This code was moved to the new dispatcher.\n"""\n';
+  assert.ok(!has(py, "history narration", { code: CODE_EXTS[".py"], profiles: ["code"] }));
+  const go = "// GetRoute returns a route. This method\n// was renamed to Get() and remains for backwards compatibility.\n";
+  assert.ok(!has(go, "history narration", { code: CODE_EXTS[".go"], profiles: ["code"] }));
+  assert.ok(has("// This function was added to replace the old parser\n", "history narration", { code: CODE_EXTS[".ts"], profiles: ["code"] }));
+});

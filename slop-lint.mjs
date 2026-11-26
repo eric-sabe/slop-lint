@@ -159,58 +159,71 @@ export const WORD_GROUPS = [
   },
   {
     // Matching is whole-word, so inflections of catalogued stems passed until now.
-    // Many of these forms are on the measured 2024 PubMed excess list by name.
-    // "elevates/elevating/elevated" are held: "elevated" is routine clinical wording.
+    // These forms are on the Kobak et al. excess-word list by name (berenslab
+    // llm-excess-vocab, results/excess_words.csv). Held despite being on the list:
+    // "elevated" (routine clinical wording) and "garnered", "surpassed", "utilized",
+    // "utilizing" (each above 0.64 per 100k words in pre-2023 human registers, the 75th
+    // percentile of the established catalogue, with no excess in corpus/samples).
     since: "0.10.0",
-    source: "inflections of catalogued stems; Kobak et al. 2025 (Science Advances) excess-vocabulary list",
+    source: "Kobak et al. 2025 (Science Advances) excess-vocabulary list: inflections of catalogued stems",
     evidence: "M1",
     era: "GPT-3.5/4 (2023-2025)",
     words: [
-      "delved", "showcased", "underscored", "fosters", "fostering", "fostered",
-      "garnered", "garnering", "garners", "leverages", "leveraged", "harnesses",
-      "harnessing", "harnessed", "empowers", "empowering", "empowered", "unlocks",
-      "unlocking", "unleashing", "unleashed", "unleashes", "revolutionizing",
-      "revolutionized", "realms", "encompass", "encompasses", "encompassed",
-      "surpassed", "surpassing", "illuminates", "illuminating", "utilizes",
-      "utilizing", "utilized", "utilization", "boasting", "boasted", "exemplify",
-      "exemplified", "exemplifying", "navigates", "navigated", "testaments", "facets",
-      "tapestries", "intricacies", "journeys", "landscapes", "ecosystems",
+      "delved", "showcased", "underscored", "fosters", "fostering", "garnering",
+      "leverages", "harnesses", "harnessing", "empowers", "unlocking", "revolutionizing",
+      "realms", "encompass", "encompasses", "encompassed", "surpassing", "illuminates",
+      "illuminating", "utilizes", "intricacies",
+    ],
+  },
+  {
+    // Inflection completion for stems in the practitioner groups; graded like the stem.
+    since: "0.10.0",
+    source: "inflection completion of catalogued stems (graded by the stem's group)",
+    evidence: "P",
+    words: [
+      "fostered", "garners", "leveraged", "harnessed", "empowering", "empowered",
+      "unlocks", "unleashing", "unleashed", "unleashes", "revolutionized", "utilization",
+      "boasting", "boasted", "exemplify", "exemplified", "exemplifying", "navigates",
+      "navigated", "testaments", "facets", "tapestries", "journeys", "landscapes",
       "supercharged", "supercharging",
     ],
   },
   {
     // Screened to zero hits on corpus/baseline (2026-11-25). "potent", "amidst" and
-    // "unprecedented" hit human oratory/journalism and are held.
+    // "unprecedented" hit human oratory/journalism and are held; "unveiled", "akin" and
+    // "revolutionary" are held after the pre-2023 register screen (screen-registers.mjs).
     since: "0.10.0",
-    source: "Kobak et al. 2025 excess style words (Fig. S6); Liang et al. 2024 peer-review adverbs; Yakura et al. 2024",
+    source: "Kobak et al. 2025 excess style words (Fig. S6); Liang et al. 2024 peer-review adverbs; Yakura et al. 2024; Batalo et al. 2025 hype annotation ('unparalleled')",
     screened: "2026-11-25",
     evidence: "M1",
     words: [
-      "elucidate", "elucidates", "elucidating", "unveil", "unveils", "unveiled",
-      "unveiling", "burgeoning", "unparalleled", "uncharted", "underexplored",
-      "surmount", "interconnectedness", "interplay", "nuanced", "akin", "poised",
+      "elucidate", "elucidates", "elucidating", "unveil", "unveils", "unveiling", "burgeoning", "unparalleled", "uncharted", "underexplored",
+      "surmount", "interconnectedness", "interplay", "nuanced", "poised",
       "adept", "pinpoint", "groundwork", "juxtaposed", "emphasizing", "lucidly",
       "aptly", "methodically", "innovatively", "compellingly", "impressively",
-      "excellently", "commendably", "revolutionary",
+      "excellently",
     ],
   },
   {
-    // The 2025-2026 "staging" vocabulary. load-bearing: 0.5 -> 12.0 hits per 10k words
-    // from Opus 4.6 to 4.7 (claude-code #53454), lift 12.3 in a 544k PR-description
-    // corpus. quietly / genuinely: lifts 7.5 / 7.2 in the same corpus plus 6-7
-    // independent practitioner sightings each. Bare "honestly" hits human oratory, so
-    // only the "Honestly?" fragment ships (see PHRASE_GROUPS).
+    // The 2025-2026 "staging" vocabulary. load-bearing: one user measured 0.5 -> 12.0
+    // hits per 10k words across three Opus 4.6/4.7 sessions (claude-code #53454; a
+    // separate method put Opus 5 near 2 per 10k, so not one trend). Lifts in the
+    // Abraham PR-description corpus (544,271 docs, fit of 2026-11-25; it refits daily):
+    // load-bearing 12.3, quietly 7.5, genuinely 7.2. "quietly" is also on Wikipedia's
+    // GPT-6 list. Not screened: the baseline has one human "quietly" (oratory).
+    // "frankly" (one practitioner list plus a secondhand Arena figure) is held, and bare
+    // "honestly" hits human oratory, so only the "Honestly?" fragment ships.
     since: "0.10.0",
-    source: "claude-code #53454; Abraham PR-description corpus (2025-2026); Wikipedia GPT-6 list; practitioner lists",
+    source: "claude-code #53454; Abraham PR-description corpus (2025-2026); Wikipedia GPT-6 list ('quietly'); practitioner lists",
     evidence: "M2",
     era: "Claude Opus 4.7-5.x, GPT-5.x/6 (2025-2026)",
-    words: ["load-bearing", "quietly", "genuinely", "frankly"],
+    words: ["load-bearing", "quietly", "genuinely"],
   },
   {
     // Creative-writing slop that leaks into general prose (GPT-4o "camaraderie" 162x,
-    // "palpable" 95x vs human). Screened to zero baseline hits.
+    // "palpable" 95x vs human, Reinhart et al. Table 1). Screened to zero baseline hits.
     since: "0.10.0",
-    source: "Antislop (Paech 2025); Reinhart et al. 2025",
+    source: "Reinhart et al. 2025 (PNAS), Table 1, GPT-4o",
     screened: "2026-11-25",
     evidence: "M1",
     words: ["camaraderie", "palpable"],
@@ -221,7 +234,7 @@ export const WORD_GROUPS = [
     profile: "review",
     source: "Liang et al. 2024 (ICLR/NeurIPS review vocabulary, top-100 appendix)",
     evidence: "M1",
-    words: ["laudable", "cogent", "ingenious", "admirable", "refreshing", "intriguing", "insightful", "compelling"],
+    words: ["laudable", "cogent", "ingenious", "admirable", "refreshing", "intriguing", "insightful"],
   },
   {
     since: "0.10.0",
@@ -248,7 +261,7 @@ export const WORD_GROUPS = [
     profile: "fiction",
     source: "Antislop / slop-score (Paech 2025: 'flickered' in the top list of 98.5% of 67 models)",
     evidence: "M1",
-    words: ["flickered", "muttered", "shimmered", "unease", "newfound", "unspoken", "etched", "unsettlingly", "elara", "kael"],
+    words: ["flickered", "shimmered", "unease", "newfound", "unspoken", "etched", "unsettlingly", "elara", "kael"],
   },
 ];
 
@@ -264,6 +277,7 @@ export const ALL_WORDS = WORD_GROUPS.flatMap((g) => g.words);
 //             the rule is not re-run on joined paragraphs
 //   position  "first" = first sentence of the prose only; "last" = last two sentences
 //   family    "contrast" rules also feed the negative-contrast density advisory
+//   unless    skip the rule when the line (or joined paragraph) also matches this
 //   anchor    "sentence": ^ means "start of a sentence"; on joined paragraphs the rule
 //             is tried from each sentence start, so the two-sentence shape is caught
 //             when a soft line break splits it
@@ -399,7 +413,7 @@ export const PHRASE_GROUPS = [
       { re: /\b(happy to (help|walk you through|go deeper|dig (in|deeper)|elaborate|expand)|feel free to (ask|reach out|let me know))\b/i, msg: 'offer-of-help close ("Happy to ...", "feel free to ask")', position: "last" },
       { re: /\bas of my (last|latest) (knowledge|training)( (update|cutoff|cut-off))?\b|\bmy knowledge cut-?off\b/i, msg: 'knowledge-cutoff disclaimer (assistant leakage)' },
       { re: /\bi (don'?t|do not) have (access to real-time|real-time|personal (opinions|experiences|feelings))\b/i, msg: 'capability disclaimer (assistant leakage)' },
-      { re: /\bhere is (a|the) revised version\b|\bimproved (the )?(clarity|readability) and (flow|structure)\b|\bpreserv(ed|ing) existing behaviou?r\b/i, msg: 'revision-request leakage ("Here is a revised version", "improved clarity and flow")' },
+      { re: /\bhere is (a|the) revised version\b|\bimproved (the )?(clarity|readability|flow)(,? (and )?(clarity|readability|flow|structure|consistency|concision))+\b|\bpreserv(ed|ing) (the )?existing (behaviou?r|structure|formatting|content|wording)\b/i, msg: 'revision-request leakage ("Here is a revised version", "improved clarity and flow")' },
     ],
   },
   {
@@ -421,7 +435,7 @@ export const PHRASE_GROUPS = [
     // intensifiers, mannered metaphors. Practitioner consensus with 2-10+ independent
     // sightings each; Bennett (Arize, 2026) gives per-1k rates for several in Opus 5.
     since: "0.10.0",
-    source: "Bennett/Arize Opus 5 vs 5.5 study; Anthropic Fable 5.1 prompting guide (via paddo.dev); Wikipedia GPT-6 list; tropes.fyi; deslop; humanizer; practitioner lists",
+    source: "Bennett/Arize Opus 5 vs 5.5 study; Anthropic Fable 5.1 prompting guide (platform.claude.com); Wikipedia GPT-6 list; tropes.fyi; deslop; humanizer; practitioner lists",
     screened: "2026-11-25",
     evidence: "P",
     era: "2025-2026",
@@ -440,14 +454,12 @@ export const PHRASE_GROUPS = [
       { re: /\bthe real (unlock|story|issue|win|work|problem|risk|cost|lesson)\b|\bthe tension is real\b/i, msg: '"the real unlock/story" pivot' },
       { re: /\bthe (hard|tricky|surprising|interesting) part is\b|\bthe part (nobody|no one)\b/i, msg: 'signpost: "the hard part is"' },
       { re: /\bi'?m not saying [^.?!]{1,60}, but\b|\ba tempting (approach|answer|move) would be\b/i, msg: 'arguing with no one ("I\'m not saying X, but")' },
-      { re: /\bis the (language|currency|grammar) of\b/i, msg: 'aphorism mold: "X is the currency of Y"' },
       { re: /\ba (dial|knob|lever) worth (turning|pulling)\b/i, msg: 'stock metaphor: "a dial worth turning"' },
-      { re: /\b(could|might|may) (potentially|possibly|perhaps)\b/i, msg: 'stacked hedge ("could potentially")', family: "hedge" },
     ],
   },
   {
     since: "0.10.0",
-    source: "Antislop 2025 (negative parallelism ~6.3x human); tropes.fyi; remove-ai-slop; Wikipedia; PENDING.md specimen",
+    source: "Antislop 2025 ('It's not X, it's Y' ~6.3x human in some models' creative writing); tropes.fyi; remove-ai-slop; Wikipedia; PENDING.md specimen",
     screened: "2026-11-25",
     evidence: "P",
     rules: [
@@ -474,7 +486,7 @@ export const PHRASE_GROUPS = [
   {
     since: "0.10.0",
     profile: "email",
-    source: "Presend; TextSight; Iro (detector-vendor guides, 2-5 sightings each)",
+    source: "Presend; TextSight; Iro (detector-vendor guides, 1-5 sightings each; 'don't hesitate to reach out' has 1)",
     evidence: "P",
     rules: [
       { re: /\bi hope (this|my) (email|message|note) finds you well\b/i, msg: 'email opener: "I hope this email finds you well"' },
@@ -503,7 +515,6 @@ export const PHRASE_GROUPS = [
     source: "Antislop / slop-score phrase lists",
     evidence: "M1",
     rules: [
-      { re: /\b(a )?breath (he|she|they|i) (didn'?t|did not) know (he|she|they|i) (was|were) holding\b/i, msg: 'fiction slop: "a breath she didn\'t know she was holding"' },
       { re: /\bvoice (barely|little more than) (above )?a whisper\b/i, msg: 'fiction slop: "voice barely above a whisper"' },
       { re: /\bheart (hammered|pounded) (against )?(his|her|their|my) ribs\b/i, msg: 'fiction slop: "heart hammered against her ribs"' },
     ],
@@ -539,11 +550,10 @@ export const PHRASE_GROUPS = [
   {
     since: "0.10.0",
     profile: "review",
-    source: "Liang et al. NEJM AI 2024; Hivemind ICLR 2026 review study (bold tag headers)",
-    evidence: "M2",
+    source: "practitioner reports of AI-written reviews (bold tag headers)",
+    evidence: "A",
     rules: [
       { re: /^\s*(\*\*|__)[A-Z][\w-]*( [\w-]+){0,2}:?(\*\*|__):?\s/, msg: 'bold tag header ("**Strengths:**")', lineOnly: true },
-      { re: /\bthe authors should consider\b/i, msg: '"the authors should consider": name the change and what it would show' },
     ],
   },
   {
@@ -551,12 +561,12 @@ export const PHRASE_GROUPS = [
     since: "0.10.0",
     profile: "code",
     codeOnly: true,
-    source: "JCarterJohnson Reddit mining (23k posts); AI-SIGNALS; SynthScan; agent-failure-modes",
+    source: "JCarterJohnson Reddit mining (11,906 posts, 11,306 comments); AI-SIGNALS; SynthScan; agent-failure-modes",
     evidence: "P",
     rules: [
       { re: /\b(here'?s the (updated|revised|modified|corrected|fixed)|as (you )?requested|i'?ve (added|updated|modified|changed|fixed|refactored|implemented))\b/i, msg: "code comment: chat leakage (\"Here's the updated ...\", \"I've added\")" },
       { re: /^\s*(step \d+[:.)]|now we\b|first,? we\b|next,? we\b|finally,? we\b)/i, msg: 'code comment: step narration ("Step 1:", "Now we")', lineOnly: true },
-      { re: /\bthis (function|method|class|component|module|code|file|helper) (was|has been|is now) (added|changed|updated|modified|refactored|introduced|moved|renamed)\b|\b(was|were) (added|changed|updated|modified|refactored) (to|in order to) (replace|fix|support|handle|address)\b|^\s*(added|updated|changed|fixed|removed|new):\s/i, msg: "code comment: history narration (describe the code, not its change; that belongs in the commit)" },
+      { re: /\bthis (function|method|class|component|module|code|file|helper) (was|has been|is now) (added|changed|updated|modified|refactored|introduced|moved|renamed)\b|\b(was|were) (added|changed|updated|modified|refactored) (to|in order to) (replace|fix|support|handle|address)\b|^\s*(added|updated|changed|fixed|removed|new):\s/i, msg: "code comment: history narration (describe the code, not its change; that belongs in the commit)", unless: /versionchanged|versionadded|deprecat|backwards?[- ]compat|for compatibility/i },
       { re: /\b(rest of (your|the) (code|implementation|logic)|(your|existing) (code|logic|implementation) goes here|implementation goes here|add your [\w ]{1,30} here)\b/i, msg: 'code comment: placeholder ("rest of your code here")' },
       { re: /^\s*this (function|method|class|component|module|helper) (handles|is responsible for|serves to|ensures|provides a (way|mechanism))\b/i, msg: 'code comment: "This function handles ..." (name what it does)', lineOnly: true },
     ],
@@ -572,8 +582,11 @@ export const PHRASES = PHRASE_GROUPS.flatMap((g) => g.rules.map((r) => ({ ...r, 
 // tokens, not style. A utm_source hit proves a chatbot found the link, not that it
 // wrote the prose.
 export const ARTIFACTS = [
-  { re: /contentReference\[oaicite:\d+\]|\boai_citation\b|\b(cite)?turn\d+(search|image|news|file|view|forecast|finance|sports)\d+\b|"attributableIndex"/, msg: "ChatGPT citation residue (oaicite / turn0search0)" },
-  { re: /[\uE200-\uE206]/, msg: "ChatGPT citation delimiter (Private Use Area U+E200-E206)" },
+  // search/image/news/file are documented (Wikipedia Markup subpage); view, forecast,
+  // finance and sports are inferred variants. The image form runs together ("i" then
+  // repeated turnNimageN), so no word boundaries between markers.
+  { re: /contentReference\[oaicite:\d+\]|\boai_citation\b|(?<![A-Za-z])(cite|i)?(turn\d+(search|image|news|file|view|forecast|finance|sports)\d+)+(?![A-Za-z])|"attributableIndex"/, msg: "ChatGPT citation residue (oaicite / turn0search0)" },
+  { re: /[\uE200-\uE202\uEA01\uEA02]/, msg: "ChatGPT citation delimiter (Private Use Area U+E200-E202, U+EA01-EA02)" },
   { re: /[?&](utm_source=(chatgpt\.com|openai|copilot\.com|perplexity|claude\.ai|gemini)|referrer=grok\.com)\b/, msg: "chatbot referral parameter in a link (utm_source=chatgpt.com)" },
   { re: /\[cite:\s*\d+(,\s*\d+)*\]|\[span_\d+\]\((start|end)_span\)/, msg: "Gemini citation residue ([cite: N] / start_span)" },
   { re: /\bgrok[-_](card|render_citation_card_json)\b/, msg: "Grok citation-card residue" },
@@ -691,9 +704,10 @@ const plain = (s) => s
 // 2026-11-25) so that a rate trips on few human documents. They are prompts to look,
 // not verdicts: syntax-only features reach AUROC 0.64-0.68 against a human slop label
 // (Shaib et al. 2025). Sources: Reinhart et al. PNAS 2025 (participial clauses 5.3x,
-// nominalizations 2.1x in GPT-4o); Bakhshi 2026 (tricolons ~1.7x per sentence,
-// performed hedges 2x); Lanzo & Angelo 2026 (flatter sentence-length rhythm in 8 of 9
+// nominalizations 2.1x in GPT-4o); Bakhshi 2026 (tricolons 1.9x per document, ~1.7x per
+// sentence after a length adjustment, performed hedges 2x); Lanzo & Angelo 2026 (flatter sentence-length rhythm in 8 of 9
 // models); Pangram (bold 65 vs 2 per 10k words); Antislop (negative parallelism).
+// Reinhart per 1k words, recomputed from hap-e-biber.csv.gz: participial human 1.73 vs GPT-4o 9.09, nominalizations 14.6 vs 31.3.
 export const RATE_THRESHOLDS = {
   // Calibration (2026-11-25, docs of 15+ sentences): human = 53 corpus/baseline docs,
   // models = 96 corpus/samples answers (Claude, Gemini, GPT, Grok). Each threshold sits
@@ -842,23 +856,26 @@ export function lintText(text, { allow = [], profiles = [], rates = true, code =
   const hits = [];
   const add = (n, s) => hits.push({ n, s });
   const free = phrases.filter((p) => !p.position);
+  const paras = paragraphs(lines, kinds);
+  // For `unless` rules: the paragraph text around each line.
+  const paraText = new Map();
+  for (const par of paras) { const t = par.lines.map((i) => lines[i]).join(" "); for (const i of par.lines) paraText.set(i, t); }
 
   lines.forEach((line, i) => {
     const n = i + 1;
     const dash = (line.match(/\u2014/g) || []).length;
     if (dash) { em += dash; add(n, `✗ em-dash ×${dash}  ${line.trim().slice(0, 64)}`); }
     for (const a of ARTIFACTS) if (a.re.test(line)) { artifacts++; add(n, `✗ artifact: ${a.msg}`); }
-    if (SMARTQUOTE.test(line)) add(n, "⚠ smart/curly quote");
+    if (SMARTQUOTE.test(line)) add(n, "⚠ smart/curly quote (weak alone: mail clients and word processors autocorrect to curly)");
     if (EMOJI.test(line)) add(n, "⚠ emoji");
     if (NNBSP.test(line)) add(n, "⚠ narrow no-break space (U+202F)");
     if (kinds[i] === "code" || kinds[i] === "front") return;
     const m = maskInline(line);
     if (DOUBLEDASH.test(m)) add(n, '⚠ "--" (em-dash approximation)');
     for (const w of words) if (!okWords.has(w) && reWord(w).test(m)) add(n, `⚠ word "${w}"`);
-    for (const p of free) if (!okPhrases.has(p) && p.re.test(m)) { add(n, `⚠ ${p.msg}`); if (p.family === "contrast") contrastHits++; }
+    for (const p of free) if (!okPhrases.has(p) && p.re.test(m) && !(p.unless && p.unless.test(paraText.get(i) ?? m))) { add(n, `⚠ ${p.msg}`); if (p.family === "contrast") contrastHits++; }
   });
 
-  const paras = paragraphs(lines, kinds);
   // Cross-line matches: a construction split over a soft line break inside a paragraph.
   for (const par of paras) {
     if (par.lines.length < 2) continue;
@@ -866,7 +883,7 @@ export function lintText(text, { allow = [], profiles = [], rates = true, code =
     const starts = p0 => p0.anchor === "sentence"
       ? splitSentences(joined).map((_, k, all) => all.slice(k).join(" ")) : [joined];
     for (const p of free) {
-      if (p.lineOnly || okPhrases.has(p) || !starts(p).some((t) => p.re.test(t))) continue;
+      if (p.lineOnly || okPhrases.has(p) || !starts(p).some((t) => p.re.test(t)) || (p.unless && p.unless.test(joined))) continue;
       if (par.lines.some((i) => p.re.test(maskInline(lines[i])))) continue;
       add(par.lines[0] + 1, `⚠ ${p.msg} (across lines)`);
       if (p.family === "contrast") contrastHits++;

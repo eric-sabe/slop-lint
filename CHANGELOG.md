@@ -16,23 +16,25 @@ on scopes and rates.
 
 - **Machine-artifact failures.** A new `ARTIFACTS` group fails the run (exit 1) and is
   never suppressible: ChatGPT citation residue (content-reference and search-turn markers,
-  `attributableIndex`, the U+E200-E206 Private Use Area delimiters), chatbot referral
+  `attributableIndex`, the Private Use Area delimiters U+E200-E202 and U+EA01-EA02, run-together image markers), chatbot referral
   parameters on links (`utm_source=chatgpt.com` and kin, `referrer=grok.com`), Gemini cite
   and span markers, Grok citation cards, Perplexity upload paths, lenticular source
   markers, and the chat UI's regenerate-button label. The bar is one documented sighting
   plus zero baseline hits, because these are tokens nobody types, not style.
-- **122 words.** Inflections of catalogued stems that whole-word matching missed (Kobak et
-  al. 2025 lists many by name: `delved`, `underscored`, `fostering`, `harnessing`;
-  `elevated` is held as routine clinical wording); measured excess vocabulary (`elucidate`,
+- **110 words.** Inflections of catalogued stems that whole-word matching missed (25 are
+  on Kobak et al.'s excess-word list by name, such as `delved`, `underscored`, `fostering`,
+  `harnessing`, and are graded M1; the rest are graded like their stems; `elevated` is on
+  the list but held as routine clinical wording); measured excess vocabulary (`elucidate`,
   `unveil`, `burgeoning`, `interplay`, `nuanced`, peer-review adverbs such as `aptly` and
   `methodically`); the 2025-2026 staging vocabulary (`load-bearing`, 0.5 to 12.0 hits per
-  10k words from Opus 4.6 to 4.7; `quietly`; `genuinely`; `frankly`); and opt-in groups
+  10k words across one user's Opus 4.6 and 4.7 sessions; `quietly`; `genuinely`); and opt-in groups
   for reviews, PR text and fiction.
-- **72 phrase rules** (39 always on, 33 in profiles): assistant leakage and openers
+- **68 phrase rules** (37 always on, 31 in profiles): assistant leakage and openers
   (`Certainly!`, knowledge-cutoff and capability disclaimers, "Here is a revised
-  version"); offer-of-help closers scoped to the last two sentences; puffery measured at
-  21,000x to 49,000x the human rate by Pangram ("a poignant reminder", "despite these
-  challenges", "the complex interplay"); the 2025-2026 staging moves ("let that sink in",
+  version"); offer-of-help closers scoped to the last two sentences; puffery ("a poignant reminder", "the complex interplay", "faced numerous challenges":
+  Pangram's February 2025 post puts five such phrases at 21,000x to 49,000x the human
+  rate, with no stated corpus; the "despite these challenges" and "focal point" forms
+  rest on Wikipedia); the 2025-2026 staging moves ("let that sink in",
   "read that again", "here's the kicker", self-answered fragment questions, "Honestly?",
   "earns its keep", "doing a lot of work", "This matters.", "that's the whole point",
   "Full stop."); the rest of the negative-contrast family ("Not because X. Because Y.",
@@ -90,7 +92,25 @@ on scopes and rates.
 
 ### Notes
 
-- Held, with reasons in `corpus/specimens/PENDING.md`: bare "honestly", "potent",
+- Every 0.10.0 source was checked against its primary source after drafting
+  (`docs/research/2026-11-verification-*.md`: 88 verified, 32 partly right, 2
+  contradicted, 1 not found). The fixes are in this release: wider artifact and
+  revision-leakage regexes, the inflection group split by evidence, "frankly",
+  "commendably", "is the currency of" and a fiction phrase dropped for want of a
+  source, the review-profile group downgraded to anecdote, and corrected numbers in the
+  skill (the 4.85x overgeneralization figure compares against expert summaries, the
+  rebuttal-chain finding reverses in one of its two corpora).
+- A register screen against 2.4M words of pre-2023 human text (reviews, abstracts, PRs,
+  commits, code, Wikipedia, fiction, email; `build-registers.mjs`, `screen-registers.mjs`,
+  results in `docs/research/2026-11-register-screen.md`) held seven words that fire on
+  human text more than the established catalogue does, dropped the stacked-hedge warning,
+  trimmed the review and fiction profiles, and taught the code history rule to skip
+  version and deprecation notes. A rule may carry an `unless` pattern for such cases.
+- An email check against one maintainer's 2026 sent mail (aggregates only,
+  `docs/research/2026-11-email-baseline.md`) found no em-dashes, no email-profile hits,
+  and curly quotes that track the mail client, so the smart-quote warning now says it is
+  weak alone.
+- Held, with reasons in `corpus/specimens/PENDING.md`: bare "honestly", "frankly", "potent",
   "amidst" and "unprecedented" (baseline hits), the GPT-5.6-era "does not by itself
   establish" disclaimers (they conflict with careful academic claim sizing), unlabelled
   PR-corpus jargon, and five new one-source molds now mirrored in `PENDING_MOLDS`.

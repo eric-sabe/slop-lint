@@ -20,7 +20,7 @@ These are tokens a person never types. They fail even inside code blocks, so the
 
 ```
 ChatGPT citation residue (contentReference markers, turnNsearchN ids)
-ChatGPT citation delimiter (Private Use Area U+E200-E206)
+ChatGPT citation delimiter (Private Use Area U+E200-E202, U+EA01-EA02)
 chatbot referral parameter in a link (utm_source=chatgpt.com)
 Gemini citation residue (bracketed cite numbers, span markers)
 Grok citation-card residue
@@ -85,34 +85,39 @@ resonated resonating
 ```
 
 ```
-# inflections of catalogued stems; Kobak et al. 2025 (Science Advances) excess-vocabulary list
+# Kobak et al. 2025 (Science Advances) excess-vocabulary list: inflections of catalogued stems
 # since 0.10.0; evidence M1; era: GPT-3.5/4 (2023-2025)
-delved showcased underscored fosters fostering fostered garnered garnering garners
-leverages leveraged harnesses harnessing harnessed empowers empowering empowered unlocks
-unlocking unleashing unleashed unleashes revolutionizing revolutionized realms encompass
-encompasses encompassed surpassed surpassing illuminates illuminating utilizes utilizing
-utilized utilization boasting boasted exemplify exemplified exemplifying navigates
-navigated testaments facets tapestries intricacies journeys landscapes ecosystems
-supercharged supercharging
+delved showcased underscored fosters fostering garnering leverages harnesses harnessing
+empowers unlocking revolutionizing realms encompass encompasses encompassed surpassing
+illuminates illuminating utilizes intricacies
 ```
 
 ```
-# Kobak et al. 2025 excess style words (Fig. S6); Liang et al. 2024 peer-review adverbs; Yakura et al. 2024
+# inflection completion of catalogued stems (graded by the stem's group)
+# since 0.10.0; evidence P
+fostered garners leveraged harnessed empowering empowered unlocks unleashing unleashed
+unleashes revolutionized utilization boasting boasted exemplify exemplified exemplifying
+navigates navigated testaments facets tapestries journeys landscapes supercharged
+supercharging
+```
+
+```
+# Kobak et al. 2025 excess style words (Fig. S6); Liang et al. 2024 peer-review adverbs; Yakura et al. 2024; Batalo et al. 2025 hype annotation ('unparalleled')
 # since 0.10.0; evidence M1; screened 2026-11-25
-elucidate elucidates elucidating unveil unveils unveiled unveiling burgeoning
-unparalleled uncharted underexplored surmount interconnectedness interplay nuanced akin
-poised adept pinpoint groundwork juxtaposed emphasizing lucidly aptly methodically
-innovatively compellingly impressively excellently commendably revolutionary
+elucidate elucidates elucidating unveil unveils unveiling burgeoning unparalleled
+uncharted underexplored surmount interconnectedness interplay nuanced poised adept
+pinpoint groundwork juxtaposed emphasizing lucidly aptly methodically innovatively
+compellingly impressively excellently
 ```
 
 ```
-# claude-code #53454; Abraham PR-description corpus (2025-2026); Wikipedia GPT-6 list; practitioner lists
+# claude-code #53454; Abraham PR-description corpus (2025-2026); Wikipedia GPT-6 list ('quietly'); practitioner lists
 # since 0.10.0; evidence M2; era: Claude Opus 4.7-5.x, GPT-5.x/6 (2025-2026)
-load-bearing quietly genuinely frankly
+load-bearing quietly genuinely
 ```
 
 ```
-# Antislop (Paech 2025); Reinhart et al. 2025
+# Reinhart et al. 2025 (PNAS), Table 1, GPT-4o
 # since 0.10.0; evidence M1; screened 2026-11-25
 camaraderie palpable
 ```
@@ -299,7 +304,7 @@ knowledge-cutoff disclaimer (assistant leakage)
 capability disclaimer (assistant leakage)
     /\bi (don'?t|do not) have (access to real-time|real-time|personal (opinions|experiences|feelings))\b/i
 revision-request leakage ("Here is a revised version", "improved clarity and flow")
-    /\bhere is (a|the) revised version\b|\bimproved (the )?(clarity|readability) and (flow|structure)\b|\bpreserv(ed|ing) existing behaviou?r\b/i
+    /\bhere is (a|the) revised version\b|\bimproved (the )?(clarity|readability|flow)(,? (and )?(clarity|readability|flow|structure|consistency|concision))+\b|\bpreserv(ed|ing) (the )?existing (behaviou?r|structure|formatting|content|wording)\b/i
 ```
 
 ```
@@ -320,7 +325,7 @@ vague attribution ("experts argue"): name the source
 ```
 
 ```
-# Bennett/Arize Opus 5 vs 5.5 study; Anthropic Fable 5.1 prompting guide (via paddo.dev); Wikipedia GPT-6 list; tropes.fyi; deslop; humanizer; practitioner lists
+# Bennett/Arize Opus 5 vs 5.5 study; Anthropic Fable 5.1 prompting guide (platform.claude.com); Wikipedia GPT-6 list; tropes.fyi; deslop; humanizer; practitioner lists
 # since 0.10.0; evidence P; era: 2025-2026; screened 2026-11-25
 staging: "let that sink in"
     /\blet (that|this|it) sink in\b/i
@@ -350,16 +355,12 @@ signpost: "the hard part is"
     /\bthe (hard|tricky|surprising|interesting) part is\b|\bthe part (nobody|no one)\b/i
 arguing with no one ("I'm not saying X, but")
     /\bi'?m not saying [^.?!]{1,60}, but\b|\ba tempting (approach|answer|move) would be\b/i
-aphorism mold: "X is the currency of Y"
-    /\bis the (language|currency|grammar) of\b/i
 stock metaphor: "a dial worth turning"
     /\ba (dial|knob|lever) worth (turning|pulling)\b/i
-stacked hedge ("could potentially")
-    /\b(could|might|may) (potentially|possibly|perhaps)\b/i
 ```
 
 ```
-# Antislop 2025 (negative parallelism ~6.3x human); tropes.fyi; remove-ai-slop; Wikipedia; PENDING.md specimen
+# Antislop 2025 ('It's not X, it's Y' ~6.3x human in some models' creative writing); tropes.fyi; remove-ai-slop; Wikipedia; PENDING.md specimen
 # since 0.10.0; evidence P; screened 2026-11-25
 "Not because X. Because Y." contrast
     /\bnot because\b[^.?!]{1,60}[.,]\s+(but )?because\b/i
@@ -438,7 +439,7 @@ boilerplate: "to ensure correct functionality"
 email: stock openers and closers.
 
 ```
-# Presend; TextSight; Iro (detector-vendor guides, 2-5 sightings each)
+# Presend; TextSight; Iro (detector-vendor guides, 1-5 sightings each; 'don't hesitate to reach out' has 1)
 # since 0.10.0; evidence P
 email opener: "I hope this email finds you well"
     /\bi hope (this|my) (email|message|note) finds you well\b/i
@@ -478,14 +479,12 @@ fiction: creative-writing slop vocabulary (Antislop).
 ```
 # Antislop / slop-score (Paech 2025: 'flickered' in the top list of 98.5% of 67 models)
 # since 0.10.0; evidence M1
-flickered muttered shimmered unease newfound unspoken etched unsettlingly elara kael
+flickered shimmered unease newfound unspoken etched unsettlingly elara kael
 ```
 
 ```
 # Antislop / slop-score phrase lists
 # since 0.10.0; evidence M1
-fiction slop: "a breath she didn't know she was holding"
-    /\b(a )?breath (he|she|they|i) (didn'?t|did not) know (he|she|they|i) (was|were) holding\b/i
 fiction slop: "voice barely above a whisper"
     /\bvoice (barely|little more than) (above )?a whisper\b/i
 fiction slop: "heart hammered against her ribs"
@@ -520,16 +519,14 @@ peer reviews: second-tier praise adjectives, bold tag headers.
 ```
 # Liang et al. 2024 (ICLR/NeurIPS review vocabulary, top-100 appendix)
 # since 0.10.0; evidence M1
-laudable cogent ingenious admirable refreshing intriguing insightful compelling
+laudable cogent ingenious admirable refreshing intriguing insightful
 ```
 
 ```
-# Liang et al. NEJM AI 2024; Hivemind ICLR 2026 review study (bold tag headers)
-# since 0.10.0; evidence M2
+# practitioner reports of AI-written reviews (bold tag headers)
+# since 0.10.0; evidence A
 bold tag header ("**Strengths:**")
     /^\s*(\*\*|__)[A-Z][\w-]*( [\w-]+){0,2}:?(\*\*|__):?\s/
-"the authors should consider": name the change and what it would show
-    /\bthe authors should consider\b/i
 ```
 
 ### academic
@@ -556,7 +553,7 @@ citation clump ("[3-9]"): name the two or three studies that matter
 code files: lint comments only, plus code-comment rules (chat leakage, step narration, history comments, placeholders).
 
 ```
-# JCarterJohnson Reddit mining (23k posts); AI-SIGNALS; SynthScan; agent-failure-modes
+# JCarterJohnson Reddit mining (11,906 posts, 11,306 comments); AI-SIGNALS; SynthScan; agent-failure-modes
 # since 0.10.0; evidence P
 code comment: chat leakage ("Here's the updated ...", "I've added")
     /\b(here'?s the (updated|revised|modified|corrected|fixed)|as (you )?requested|i'?ve (added|updated|modified|changed|fixed|refactored|implemented))\b/i

@@ -89,7 +89,7 @@ LLM reviews are longer, more positive (higher scores), more alike across papers,
 ## 4. Citation behaviors: fabrication, misattribution, vague support, citation bias
 
 ### Takeaway
-Fabricated references are now measurable in accepted top-venue papers (about 1 in 20 NeurIPS 2025 papers has at least two likely hallucinated references; ACL-family papers with hallucinated references rose from 0.28% in 2024 to 2.59% in 2025). Beyond fabrication, LLM references are often real but wrong in metadata, attached to the wrong claim during synthesis, and skewed toward highly cited, short-titled canonical works.
+Fabricated references are now measurable in accepted top-venue papers (about 1 in 20 NeurIPS 2025 papers has at least two likely hallucinated references; ACL-family papers with hallucinated references rose from 0.28% in 2024 to 2.59% in 2025, per [Sakai et al.](https://arxiv.org/html/2601.18724) Table 4). Beyond fabrication, LLM references are often real but wrong in metadata, attached to the wrong claim during synthesis, and skewed toward highly cited, short-titled canonical works.
 
 ### Cited Findings
 - STRONG. Walters and Wilder (2023, Scientific Reports): 636 references in 84 generated literature reviews; 55% of GPT-3.5 and 18% of GPT-4 references fabricated; across six prior studies 51% of 732 citations fabricated. [Scientific Reports](https://www.nature.com/articles/s41598-023-41032-5)

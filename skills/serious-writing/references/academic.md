@@ -6,13 +6,13 @@ Load this file for papers, theses, abstracts, grant and research proposals, lite
 
 The Tier 2 commandments began here. A professor wrote this about an LLM-assisted methodology draft: "The writing is grammatically correct, but it has the LLM-like property of not correctly modeling theory of mind in knowing what to include or omit. It provides lists of facts without connecting them, and/or it will give text meant to answer a question or rebut a rejection that wasn't revealed." A later draft drew a second note: stop being cutesy and clever, because the audience is academic.
 
-Both complaints now have measured counterparts. Lists of unconnected facts match report-by-paper literature reviews, and support-to-support transitions in model essays run at about half the human rate. Unprompted rebuttals match rebuttal-to-rebuttal transitions at 52.0% for default models against 32.4% for humans (Kim et al. 2026), although that corpus is public debate, so the transfer to papers is inference. The cutesy register is partly a stress-position failure: a punchline in the last words of a short sentence takes the emphasis that belongs to the claim (craft synthesis from Gopen and Swan 1990).
+Both complaints now have measured counterparts. Lists of unconnected facts match report-by-paper literature reviews, and support-to-support transitions in model essays ran at one-half to three-quarters of the human rate. Unprompted rebuttals match a measured habit only in part: in Boston Review essays, default models chained rebuttal to rebuttal at 52.0% against 32.4% for humans, but New York Times debate essays showed the reverse (10.9% against 21.2%) (Kim et al. 2026). Both corpora are public debate, so the transfer to papers is inference. The cutesy register is partly a stress-position failure: a punchline in the last words of a short sentence takes the emphasis that belongs to the claim (craft synthesis from Gopen and Swan 1990).
 
 ## The reader and the register
 
 The reader is an expert in the field who reviews for its venues and has never seen this project. Write in formal academic prose, as in the method sections of good papers in the field, with no contractions.
 
-Signposts follow one rule: organize the content and do not narrate the text. Content ordinals stay (First, Second, Third, In contrast). A long introduction may end with one sentence that gives the plan of the paper. Cut sentences whose subject is the paper or the section (`In this section, we will discuss`, `As mentioned above`, `It is worth noting`). Use "To our knowledge" at most once, attached to the search that supports it. Do not use `To address this gap` as a stock opener, since model introductions over-use the gap step at 12.4 to 16.0% of segments against 9.6% for humans (measured: CARS study 2026). Model text also carries extra interactive metadiscourse (measured: Jiang and Hyland 2025).
+Signposts follow one rule: organize the content and do not narrate the text. Content ordinals stay (First, Second, Third, In contrast). A long introduction may end with one sentence that gives the plan of the paper. Cut sentences whose subject is the paper or the section (`In this section, we will discuss`, `As mentioned above`, `It is worth noting`). Use "To our knowledge" at most once, attached to the search that supports it. Do not use `To address this gap` as a stock opener. In one 2026 study, Claude, Gemma and Qwen introductions gave 10.8 to 16.0% of segments to the gap step against 9.6% for humans, although GPT-5.5 gave it less (7.1 to 8.8%) (measured: CARS study 2026). Model essays also lean on transitions and endophoric markers (measured: Jiang and Hyland 2025), although a 2026 replication found fewer interactive markers under a plain prompt (Crosthwaite et al. 2026).
 
 | Written for effect | Plain |
 | --- | --- |
@@ -26,7 +26,7 @@ Gopen and Swan's egg-extract revision shows commandment 9 at work. The original 
 
 Do not open the first sentence on a centrality claim (`In recent years, X has attracted increasing attention`, `X is central to`). Open on the specific problem, the specific prior result the paper builds on, or, where the venue allows, the present study's question. In one 2026 study, models opened on centrality in 58 to 84% of introductions against 46% for humans, and opened on the literature in 0 to 12% against 32% (measured: CARS study 2026). Since 46% of humans also open this way, treat the rule as a default to depart from with a reason.
 
-Keep only the moves and steps this reader needs. Models used 6.1 to 7.4 of the 10 steps of Swales' CARS model against 5.3 for humans, and a blind reader caught 90% of generated introductions from structure alone (same study). Test: list the CARS steps the draft contains (centrality, generalization, review, gap, question, purpose, findings, value, structure). A draft that contains every step is over-complete, and a well-known problem needs no centrality paragraph.
+Keep only the moves and steps this reader needs. Models used 6.1 to 7.4 of the 10 steps of Swales' CARS model against 5.3 for humans, and a blind reader who knew the CARS model and the study's findings told 54 of 60 Claude-written introductions from the originals, citing structure in almost every judgment (same study). Test: list the CARS steps the draft contains (centrality, generalization, review, gap, question, purpose, findings, value, structure). A draft that contains every step is over-complete, and a well-known problem needs no centrality paragraph.
 
 State one gap, tied to the named prior work that leaves it open. Test: count gap statements (`little is known`, `remains underexplored`, `To our knowledge, no study has`). Fail on more than one per introduction, or on a gap the cited literature does not demonstrate.
 
@@ -44,13 +44,13 @@ Run three tests on each paragraph. First, count sentences whose subject is a sin
 
 For every result claim, compare tense, quantifier and population against the result as measured. A past-tense, sample-specific result restated as a present-tense generic is scope inflation. "The treatment was effective in this study" must not become "The treatment is effective". Keep the sample, condition and tense: "In our sample of 145 apps, X occurred in 31%".
 
-The evidence is strong. Model summaries of research were 4.85 times more likely than the original to contain broad generalizations (95% CI 3.06 to 7.70). Prompts that asked for accuracy made overgeneralization nearly twice as likely, and newer models did worse than older ones (measured: Peters and Chin-Yee 2025).
+The evidence is strong. Model summaries of research were about twice as likely as the original abstracts to state generalized conclusions, and 4.85 times as likely as expert-written summaries of the same articles (odds ratio, 95% CI 3.06 to 7.70). Prompts that asked for accuracy made overgeneralization nearly twice as likely, and most newer models did worse than older ones (measured: Peters and Chin-Yee 2025).
 
 Two related checks apply in the Discussion. A paragraph that moves from one supporting sentence straight to `Practitioners should` or `Policymakers should` is a proposal rush, so state only the implication the results license, next to the result that licenses it. A limitation or implication that could appear unchanged in another paper on the topic is generic, so tie it to a number or design choice from this paper.
 
 ## Stance, hedging and self-mention
 
-Default model text in academic genres carries fewer calibrated hedges than human text. In discussion and conclusion sections of applied linguistics articles, human authors used 30.02 hedges per 1,000 words against 21.04 for GPT-4 (measured: Shiraz study). Performed epistemic markers run at about twice the human rate (measured: Bakhshi 2026). When a prompt asks for stance, hedges reach human levels but boosters overshoot (measured: Crosthwaite et al. 2026). The fix is functional:
+Default model text in academic genres carries fewer calibrated hedges than human text. In discussion and conclusion sections of applied linguistics articles, human authors used 30.02 hedges per 1,000 words against 21.04 for GPT-4 (measured: Shiraz study). In argumentative essays, performed epistemic markers ran at about twice the human rate, under a prompt that asked models to engage with uncertainty (measured: Bakhshi 2026). When a prompt asks for stance, hedges reach human levels but boosters overshoot (measured: Crosthwaite et al. 2026). The fix is functional:
 
 - Hedge interpretations and generalizations ("which suggests", "in this sample"). Never hedge a measured value. Hedges on data statements weaken persuasion (measured, effect sizes not retrieved: Britt et al. 2008).
 - Give each main claim one epistemic marker matched to its evidence.
@@ -62,7 +62,7 @@ Self-mention studies disagree on direction. Student-essay studies find fewer sel
 
 Claim-sizing sentences such as `does not by itself establish` appear elsewhere as a 2026 disclaimer mold, and the catalogue holds them out of its academic profile on purpose. In a paper, a sizing sentence is what commandment 12 asks for when it bounds a specific claim and gives the reason. Cut it when it bounds nothing in particular (`These results should be interpreted with caution`).
 
-Watch for scaffolding bundles used as connectors in place of reasoning (`in the context of`, `in terms of the`, `a wide range of`, `the role of`) in prose with few epistemic bundles (`this suggests that`, `we argue that`). Model essays use a narrower, more rigid set of bundles (measured: Jiang and Hyland 2025).
+Watch for scaffolding bundles used as connectors in place of reasoning (`in the context of`, `in terms of the`, `a wide range of`, `the role of`) in prose with few epistemic bundles (`this suggests that`, `we argue that`). Model essays use fewer bundles, in more rigid and formulaic forms, with more noun- and preposition-based bundles and fewer stance bundles (measured: Jiang and Hyland 2025, Applied Linguistics).
 
 ## Citations
 
@@ -77,7 +77,7 @@ A DOI resolver catches a fabricated reference, but it misses a real paper attach
 
 ## Peer reviews
 
-Model reviews are longer, more positive and more alike across papers, and they judge novelty less often than human reviews. GPT-4 commented on implications 7.27 times more often and on novelty 10.69 times less often than human reviewers, and humans requested ablations 6.71 times more often (measured: Liang et al., NEJM AI 2024). Fully AI-written ICLR 2026 reviews averaged 507 words against 424 and were more similar to each other across different papers (measured: Hivemind 2026). Use these content findings. The often-quoted share of AI-written ICLR 2026 reviews is contested on method, so do not cite it.
+Model reviews are longer, more positive and more alike across papers, and they judge novelty less often than human reviews. GPT-4 commented on implications 7.27 times more often and on novelty 10.69 times less often than human reviewers, and humans requested ablations 6.71 times more often (measured: Liang et al., NEJM AI 2024). Fully AI-written ICLR 2026 reviews averaged 507 words against 424 for human or AI-assisted reviews and were more similar to each other across different papers (measured: Hivemind 2026). Use these content findings. The often-quoted share of AI-written ICLR 2026 reviews is contested on method, so do not cite it.
 
 - Each weakness names a location (section, table, figure, equation, line) and its consequence for the paper's claim.
 - One sentence judges novelty against the closest named prior work.
@@ -111,7 +111,7 @@ Also search for the chat UI's regenerate-button label, which the linter fails on
 
 ## Audit order and field differences
 
-Audit the Discussion first, then the abstract and introduction, then the reference list. In December 2025 PubMed Central papers, 68% of Discussion paragraphs were LLM-assisted against 32% of Methods paragraphs (measured: Kobak et al. 2026). The Discussion is where to look hardest for unprompted rebuttals, generic implications and recap.
+Audit the Discussion first, then the abstract and introduction, then the reference list. In December 2025 PubMed Central papers, 68% of Discussion paragraphs were LLM-assisted against 32% of Methods paragraphs (measured: Holzwarth et al. 2026). The Discussion is where to look hardest for unprompted rebuttals, generic implications and recap.
 
 Fields differ:
 
@@ -128,7 +128,8 @@ Fields differ:
 - Peters and Chin-Yee, overgeneralization in LLM summaries (2025). https://www.ncbi.nlm.nih.gov/pmc/articles/PMC12042776/
 - Kim et al., argument structure in LLM essays (2026). https://arxiv.org/html/2606.01736v1
 - Crosthwaite et al., Modern Language Journal (2026). https://onlinelibrary.wiley.com/doi/full/10.1111/modl.70089
-- Jiang and Hyland, stance and bundles in ChatGPT essays (2025). https://ueaeprints.uea.ac.uk/id/eprint/99123/
+- Jiang and Hyland, metadiscourse in ChatGPT and student essays, English for Specific Purposes 79 (2025). https://ueaeprints.uea.ac.uk/id/eprint/99123/
+- Jiang and Hyland, bundles in ChatGPT and student argumentative essays, Applied Linguistics 46(3) (2025). https://academic.oup.com/applij/article-abstract/46/3/375/7736875
 - Shiraz study of discussion sections, human against GPT-4. https://tesl.shirazu.ac.ir/article_8833_bd7da341b6c638e9f62814a8620ce174.pdf
 - Bakhshi, rhetorical features of LLM essays (2026). https://arxiv.org/html/2604.19768
 - Reinhart et al., PNAS (2025). https://arxiv.org/html/2410.16107v2
@@ -138,5 +139,7 @@ Fields differ:
 - Phantom References (2026). https://arxiv.org/html/2607.00738
 - Algaba et al., citation bias in LLM suggestions (2024). https://arxiv.org/html/2405.15739v1
 - Academ-AI, leakage in published papers. https://arxiv.org/html/2411.15218
-- Kobak et al., LLM use in PMC full texts (2026). https://arxiv.org/html/2608.10715v1
+- Holzwarth, González-Márquez and Kobak, LLM use in PMC full texts (2026). https://arxiv.org/html/2608.10715v1
+- Seifi and Seyfi, LLM citations in neurocritical care, Critical Care Explorations (2026). https://pmc.ncbi.nlm.nih.gov/articles/PMC13506236/
+- Liang et al., LLM use in scientific papers, Nature Human Behaviour (2025). https://doi.org/10.1038/s41562-025-02273-8
 - "How LLMs Distort Our Written Language" (2026). https://arxiv.org/html/2603.18161v1

@@ -25,6 +25,13 @@ runs (`npm run specimens -- <harvest>`) flag second sightings automatically.
 
 - Bare "honestly", "potent", "amidst", "unprecedented": one or more hits in the human
   baseline. "honestly" ships only as the "Honestly?" fragment.
+- "frankly": one practitioner list plus a secondhand Arena figure.
+- Register screen (2026-11-25, `docs/research/2026-11-register-screen.md`): `unveiled`,
+  `surpassed`, `utilized`, `utilizing`, `garnered`, `ecosystems`, `akin`, `revolutionary`
+  fire on pre-2023 human text above the established catalogue's rate; the stacked hedge
+  "could potentially" is common in human text and lives in the hedge-rate advisory only;
+  review `compelling` and fiction `muttered` are common in their registers.
+- "X is the currency/language/grammar of Y": one sighting (humanizer).
 - "does not by itself establish", "should not be treated as exact" (Wikipedia, GPT-5.6
   era): conflicts with the careful claim-sizing that academic prose needs.
 - "studies/research have shown": fails the screen (MedlinePlus), so it ships in the
