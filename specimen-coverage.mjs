@@ -23,8 +23,13 @@ export const PENDING_MOLDS = [
   { name: "whether-actually-or-whether-just", re: /\bwhether \w+ actually \w+[^.?!]{0,40}, or whether \w+ just\b/i },
   { name: "the-gap-x-cant-close", re: /\bthe gap [^.?!]{1,30}can'?t close\b/i },
   { name: "has-never-been-more", re: /\bhas never been more (important|critical|urgent|essential|relevant|true)\b/i },
-  { name: "is-no-longer-x-it-is-y", re: /\bis no longer [^.?!]{1,60}[.?!]\s+it is\b/i },
   { name: "verb-echo-staccato-pair", re: /^(\w+ ){0,3}(\w{4,})s? [^.?!]{1,30}\.\s+(\w+ ){0,3}\2s?\b/i },
+  // 0.10.0 research holds (one source each; see PENDING.md)
+  { name: "validation-opener", re: /\b(it'?s completely understandable|that sounds (really )?(hard|tough|difficult))\b/i },
+  { name: "here-is-what-you-need-to-know", re: /\bhere'?s what you need to know\b/i },
+  { name: "rag-disclaimer", re: /\b(while specific details are limited|not widely documented|in the provided sources|based on (the )?available information)\b/i },
+  { name: "placeholder-token", re: /\[(your name|insert [^\]]{1,30})\]|\bINSERT_[A-Z_]+\b|\b20\d\d-xx-xx\b/i },
+  { name: "below-is", re: /^\s*below is\b|\bbased on the (text|information) provided\b/i },
 ];
 
 function report(label, lines) {

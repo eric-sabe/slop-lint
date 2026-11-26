@@ -16,11 +16,11 @@
  */
 
 import { writeFileSync, existsSync } from "node:fs";
-import { discover, WORDS, PHRASES, VERSION } from "./slop-lint.mjs";
+import { discover, ALL_WORDS, PHRASES, VERSION } from "./slop-lint.mjs";
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 
-const known = new Set(WORDS.map((w) => w.toLowerCase()));
+const known = new Set(ALL_WORDS.map((w) => w.toLowerCase()));
 
 function readDir(dir) {
   if (!existsSync(dir)) return [];
@@ -70,7 +70,7 @@ async function wikipediaSection() {
   }
   if (!items.size) return "## Wikipedia: Signs of AI writing\n\n_No parseable 'Words to watch' items this run (page format may have changed)._\n";
   // A phrase is a coverage gap if no existing phrase rule matches it and none of its
-  // content words are already in WORDS.
+  // content words are already in ALL_WORDS.
   const gaps = [...items].filter((phrase) => {
     if (PHRASES.some((p) => p.re.test(phrase))) return false;
     const toks = phrase.match(/[a-z][a-z'-]{3,}/g) || [];

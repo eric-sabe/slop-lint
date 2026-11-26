@@ -1,6 +1,6 @@
 {
   "name": "slop-lint",
-  "version": "0.9.1",
+  "version": "0.10.0",
   "description": "Zero-dependency linter that flags AI 'slop' in prose: fails on the em-dash, warns on LLM tells (words, cliches, constructions).",
   "type": "module",
   "bin": {
@@ -15,13 +15,14 @@
   },
   "scripts": {
     "test": "node --test",
-    "lint": "node slop-lint.mjs README.md",
+    "lint": "node slop-lint.mjs README.md CHANGELOG.md skills",
     "discover": "node slop-lint.mjs --discover --samples corpus/samples --baseline corpus/baseline",
     "generate": "node --env-file-if-exists=.env generate-samples.mjs",
     "baseline": "node build-baseline.mjs",
     "stats": "node corpus-stats.mjs",
     "specimens": "node specimen-coverage.mjs",
-    "refresh": "node refresh.mjs"
+    "refresh": "node refresh.mjs",
+    "skill": "node build-skill.mjs"
   },
   "keywords": [
     "lint",

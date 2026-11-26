@@ -1,0 +1,109 @@
+Friday, March 2, 2007
+
+Sirius CEO Mel Karmazin appeared before a newly formed Antitrust Task Force, a sub-committee of the House Judiciary Committee, on Wednesday last week in Washington, D.C. to defend the proposed U.S. merger between XM and Sirius satellite radio services.
+
+The hearing, carried live on C-SPAN, was attended by representatives from various competing broadcast companies. The representatives challenged the merger deal, and some speakers were openly hostile to Karmazin and to satellite radio in general, while other speakers were more civil.
+
+Several times during the debate, the discussion centered on the failed merger deal between the two satellite television networks DirecTV and Echostar. The comparison between this proposed radio merger and the failed television merger was settled to some extent with an understanding that nearly all television viewers now use either cable or satellite to view available programming. Televised programming content is now delivered mainly in the form of a subscription, rather than airwave transmissions.
+
+Unlike television programming, most radio listeners use over the air receivers to listen to free programming content supported advertisers.
+
+"We come to this hearing with an open mind, but we recognize that the companies have the obligation to convince the Congress, the regulators, and most importantly, the American People that this combination will improve the competitive playing field and benefit consumers," said John Conyers, the sub-committee chairman. To determine the legality of this merger, Congress first needs to decide whether a combined XM and Sirius would be a monopoly, as the only satellite radio provider in the United States, or whether the new company will actually be in competition with other forms of radio-like entertainment, according to Conyers. The hearing focused on alternatives such as Internet radio, terrestrial radio, portable audio devices, and emerging services, such as cell phone services and WiMax.
+
+== The Issue ==
+
+At the heart of the debate is whether the two competing satellite services could drive each other to improve both of their services, or whether the proposed merger could result in end-user cost reductions by making more money available for Research & Development, new content, and subscription price reductions.
+
+== Highlights ==
+
+=== David Rehr ===
+
+David Rehr, president of the National Association of Broadcasters, spoke first. In a speech riddled with loaded terms like "government sanctioned monopoly" and "government bailout", he laid out points:
+
+This merger would create a government sanctioned monopoly.
+
+This government sanctioned monopoly would violate FCC rules and precedent (DirectTV and Echostar), Congressional rules, and anti-trust principles.
+
+This government sanctioned monopoly would undermine competition
+
+Both companies have a pattern of violating the terms of the FCC licenses and can't be trusted.
+
+XM and Sirius are not failing companies and should not receive a government bailout.
+
+Rerh accused Sirius and XM of breaking promises and asserted that neither company can be trusted. To trust the new, combined company would be stupid, he alleged.
+
+=== Gigi Sohn ===
+
+Gigi Sohn of Public Knowledge presented a more balanced view. On one hand, consolidation will raise questions about price and choice. On the other hand, XM and Sirius have engaged in a spending war, harming both companies financially. She also proposed conditions to protect consumer choice, such as public radio and educational programming requirements. Touching on the Recording Industry Association of America lawsuit, she also stated that consumers should be allowed to record programming.
+
+=== Mark Cooper ===
+
+Mark Cooper spoke on behalf of the Consumer Federation of America. "We have not given up on competition," Cooper said. Like David Rehr, he pointed out the restriction by the Federal Communications Commission (FCC) against merging the two licenses. He believed the distinction between satellite and terrestrial radio makes satellite a unique market, where satellite radio is mobile and nationwide, and is not content-regulated. He also touched on the conditions of entry into the FCC market, "Four is few and six is many, we only have two in this market."
+
+Cooper also brought up "inter-modal competition" (competition between services that offer similar, but not the same products.) According to him, inter-modal competition has a poor track record of keeping down costs and increasing product quality.
+
+Cooper was extremely outspoken against a "regulated monopoly", and said "consumers are better served by competition."
+
+=== Charles Biggio ===
+
+Charles Biggio has a history in anti-trust regulation. He advocating finding more facts regarding the merger. His argument focused around Section 7 of the Clayton Act (see section 18.) Unlike other speakers, he did not have an agenda to pursue, but rather spoke specifically on government regulations.
+
+=== Mel Karmazin ===
+
+Mel Karmazin spoke on behalf of both XM and Sirius. Karmazin made several points and promises:
+
+The price will not go up. At the beginning that was implied, but by the end of the meeting he made a promise that the price of the XM and Sirius service will not be raised over the current $12.95 a month mark, and will probably go down as tiered products are introduced.
+
+The merger was willing to comply with any reasonable restrictions placed on the new company.
+
+Consumers would not need to switch to new radios. A unified receiver has been developed, and he has one sitting in his office right now. This receiver can't be produced now because of the cost: no manufacturer wants to touch it becaus of the lack of subsidization by XM or Sirius; it would not be reasonable to expect one company to subsidize the manufacture a radio that might not result in a subscription to that company's product.
+
+XM and Sirius satellite radio compete with the IPod, local stations, WiMax, cell phones, and Internet radio.
+
+Sirius could provide tiered service, however the technology is not in place to allow customers to pick and choose individual channels.
+
+=== Other monopolies ===
+
+Howard Berman (D-California 28th District) made a profound remark: "As I listen to Mr. Rehr's testimony, and when he was talking about merged entities that controlled many radio markets, I thought for a second he was talking about ClearChannel." The media company ClearChannel holds a considerable stake in the broadcast bandwidth in the United States.
+
+=== Diversity ===
+
+House Representative Sheila Jackson Lee (D-Texas) asked about diversity, wondering how the new company would create opportunites for minority ownership and minority involvement in the company's broadcasting?
+
+Karmazin responded that Sirius and XM have several channels aimed at the African American community: music, entertainment, and talk channels. He noted that each network also carries Spanish-language channels.
+
+To the impression that the combined stations would provide for minority-oriented programming, Karmazin explained that news and talk feeds were simply picked up from existing TV and radio networks, which left Rep Lee apparently unconvinced that their interests would be served.
+
+== Conclusions ==
+
+As a debate, this session did not definitevly resolve any issues, and more debate will be necessary. However, it did reveal some interesting facts and motivations:
+
+The National Association of Broadcasters (NAB) is going to fight this merger tooth and nail.
+
+Sirius and XM will both operate as they do currently for the foreseeable future. Both XM and Sirius radios will continue to receive their existing channels, in addition to new content carried over from the other network.
+
+If the merger does go through, there may be additional requirements, such as educational programming and price controls.
+
+XM and Sirius can be said to compete with other media outlets, such as terrestrial radio and portable audio devices.
+
+The NAB's presence at the meeting seems to contradict their monopoly claims. While the NAB claims that the merger would create a monopoly, they act as if it won't: the satellite network will be competing with NAB stations.
+
+Based on an Arbitron report, a satellite radio listener actually listens to more terrestrial radio than a non-satellite radio listener: 14 hours of terrestrial radio for 10 hours of satellite.
+
+Emerging technologies exist that will increase the competition in the marketplace: cell phones can now download songs and news. Podcasting is on the rise. Internet radio is more popular than ever.
+
+At this point, most of the panel members did not want to hear "trust me" from Karmazin. They wanted some other form of assurance.
+
+If the companies do indeed form a monopoly, the cost of entry for new competitors is high.
+
+Nobody knows whether approving or denying the meger will save or destroy satellite radio.
+
+The merger faces more lobbying and politicizing of this issue as the proposal moves forward.
+
+== Sources ==
+
+Paul R. La Monica. Sirius and XM get grilled in Congress — CNN Money, February 28, 2007
+
+C-SPAN "House Committe Hearing on the XM and Sirius merger (Real Player webcast)" February 28, 2007
+
+rtsp://video.c-span.org/15days/e022807_sirius.rm (Real Player stream)

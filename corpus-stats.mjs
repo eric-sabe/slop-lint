@@ -11,6 +11,7 @@
 
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
+import { docRates } from "./slop-lint.mjs";
 
 const strip = (t) => t.replace(/^﻿?---\r?\n[\s\S]*?\r?\n---\r?\n/, "");
 function texts(dir) {
@@ -38,6 +39,8 @@ for (const dir of dirs) {
   const ts = texts(dir);
   if (!ts.length) continue;
   let words = 0, em = 0, semi = 0, cq = 0, ell = 0, bold = 0;
+  const rs = ts.map((t) => docRates(t)).filter((r) => r.sentences >= 15);
+  const avg = (k) => rs.length ? rs.reduce((a, r) => a + r[k], 0) / rs.length : NaN;
   for (const t of ts) {
     words += (t.match(/\S+/g) || []).length;
     em += (t.match(/—/g) || []).length;
@@ -46,7 +49,8 @@ for (const dir of dirs) {
     ell += (t.match(/…/g) || []).length + (t.match(/\.\.\./g) || []).length;
     bold += Math.floor((t.match(/\*\*/g) || []).length / 2);
   }
-  rows.push({ name: dir.replace(/^corpus\//, ""), words, em, semi, cq, ell, bold });
+  rows.push({ name: dir.replace(/^corpus\//, ""), words, em, semi, cq, ell, bold,
+    docs: rs.length, cv: avg("sentenceCV"), part: avg("participial"), nom: avg("nominalization"), tri: avg("tricolon") });
 }
 if (!rows.length) { console.log("corpus-stats: no text found. Generate a corpus first (npm run generate)."); process.exit(0); }
 
@@ -55,4 +59,11 @@ for (const r of rows) {
   console.log(`${r.name.padEnd(18)} ${String(r.words).padStart(6)}   ${rate(r.em, r.words).padStart(9)}  ` +
     `${rate(r.semi, r.words).padStart(11)}  ${rate(r.cq, r.words).padStart(12)}  ${rate(r.ell, r.words).padStart(10)}  ${rate(r.bold, r.words).padStart(6)}`);
 }
-console.log("\nem-dash is the hard-fail tell; elevated curly-quote / semicolon rates are softer generator signals.");
+console.log("\nstructure (mean over docs with 15+ sentences; see RATE_THRESHOLDS in slop-lint.mjs)");
+console.log("corpus               docs  sentence-CV  participial/100s  nominal%  tricolon/s");
+for (const r of rows) {
+  console.log(`${r.name.padEnd(18)} ${String(r.docs).padStart(6)}  ${r.cv.toFixed(2).padStart(11)}  ${r.part.toFixed(1).padStart(16)}  ` +
+    `${(100 * r.nom).toFixed(1).padStart(8)}  ${r.tri.toFixed(2).padStart(10)}`);
+}
+console.log("\nem-dash is the house-style hard fail, strongest as a signal for Claude through Opus 5. Curly quotes are a");
+console.log("softer generator signal (GPT, Grok). Semicolons are not: most model samples sit below the human baseline.");

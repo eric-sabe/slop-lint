@@ -1,0 +1,103 @@
+From: Sue Gardner <edited>Amgine wrote:
+
+I figure this will be easiest if we remain on a single e-mail thread then.
+
+Sure, that's fine. So I will keep it all here.
+
+I've been collecting documentation regarding the Wikimedia Foundation's recent fundraising efforts for a news article on Wikinews (No doubt, Sue, Erik has informed you I left the project, as well as curtailed my volunteer involvement with WMF, upon his election to the Board of Trustees. For your benefit, Erik, I am tentatively doing some minor editing and rc-patrol on en.wn) I believe I have a reasonably complete picture of preliminary results.
+
+Great: let me know if you have any questions or need anything confirmed. You can also, obviously, feel free to speak with Erik. Please be aware also that the "Contributions summary" page isn't necessarily the full picture: it doesn't include all donations sources. So if you want to use totals for your story, you should confirm them with me or Erik to ensure they're complete.
+
+But I do have a number of questions based on what I've learned.
+
+1. A $250k donation, earmarked for hardware. I would appreciate knowing who made the donation, when, and (if possible) why. I'd love to know if the WMF has determined how this donation will be used.
+
+The 250K is coming from a recently-established private foundation that has educational goals similar to ours: they admire what we're doing and want to support us, so they phoned the office and offered to make a contribution. (I'm not sure if it matters for your story, but the 250K is actually unrelated to the online fundraiser, and is not included in the fundraiser totals. Also, it may be worth noting that we have not received the money yet. This is totally fine: these things always take a while.)
+
+After that call, I consulted with the tech team, and we decided to use the money to buy core database servers in our Florida cluster. We had intended to buy the servers anyway: this donation will simply cover most/all of the cost.
+
+I am happy to tell you the basic story, but I don't want to publicly give the name of the organization that's offering us the money: I don't have their permission to do that. They might be fine with it: who knows. I just am not comfortable making that decision for them.
+
+2. A $500k donation. I would appreciate knowing who made the donation, when, and (if possible) why. I'd also like to know if there were any restrictions placed on this donation, like the previous one was dedicated to hardware purchases.
+
+You may already know that our default position is to give donors anonymity unless they specifically say it's okay to use their names. Lots of donors, particularly those who are giving large amounts, prefer to remain anonymous, and I think it's only fair to respect that. In this instance, I don't have permission to give the donor's name: sorry.
+
+I do not know specifically why this donor made the contribution: clearly they wanted to support our work, but I don't know anything more specific than that. And no, there were no restrictions put on the donation.
+
+3. A presentation was made to Sun Microsystems by yourselves, plus Roger McNamee in December. This presentation was at least partially created on November 20th and 21st, and has a large amount of information in it regarding recent past, present, and near-term financial, technical, and traffic. I have at least several questions regarding this presentation, including:
+
+3.a When did the meeting with Sun Microsystems take place, and with whom did you meet?
+
+3.b Assuming the donations proposals are eventually worked out and all parties are able to reach agreement, will the WMF move to a proprietary server network?
+
+3.c One of the technical advances discussed in the proposal is collaborative video. Researching this I discovered a mediawiki site within Kaltura which seemed to be very closely related. Is this connection correct?
+
+In general, I don't want to have a conversation with the media (even friendly media!) about meetings we have with other organizations, until and unless there is something worth talking about. We have lots of provisional conversations with lots of different organizations and people, which don't necessarily imply anything about future plans or possibilities. So as a general practice, I would never comment on a specific meeting or presentation.
+
+Beyond that, as I'm sure you know, the Wikimedia Foundation is committed to running on an infrastructure powered by open source and open standards. We have no plans to change that.
+
+Amgine, let me know if there's any more information I can give you. I'm going to be away from the computer for a couple of hours; back later tonight and obviously tomorrow as well.
+
+Thanks for your interest, and best regards.
+
+Sue
+
+I should very much like to know answers to these and other questions, and will be in irc://freenode.net/Wikinews-en for some hours yet this evening if that would speed the process.
+
+Best regards,
+
+Amgine
+
+On 7-Jan-08, at 4:11 PM, Sue Gardner wrote:
+
+Hi Amgine,
+
+I'd be happy to talk with Wikinews about the fundraiser - although it would be great if you could wait a few days; we are collating all the donations right now, and don't yet have final totals. I'm CCing Erik so he can jump in & say when we will.
+
+Do you want to do it by e-mail? If so, I can start answering questions now, and fill in the blanks when I get the last bits of info.
+
+Let me know what you think - thanks,
+
+Sue
+
+Original Message --------
+
+Subject: Re: [Ticket#2008010610008625] Interview with Sue Gardner
+
+Date: Mon, 7 Jan 2008 00:21:24 +0000
+
+From: Wikimedia press team <press@wikimedia.org>
+
+Organization: Wikimedia
+
+To: Sue Gardner <edited>
+
+forwarded from OTRS by Angela
+
+Forwarded message from Amgine <amgine@saewyc.net> ---
+
+From: Amgine <edited>
+
+To: press@wikimedia.org
+
+Subject: Interview with Sue Gardner
+
+Date: 2008-01-06 23:55:49
+
+Hi!
+
+This is Amgine at en.Wikinews. I'm working on a story involving the Wikimedia Foundation, especially covering the recently ended Fundraiser drive. I'm looking for the opportunity to interview Sue Gardner, hopefully in the early part of this week. I can be reached most easily by cell phone, <edited>, or home phone <edited>, or IRC (check irc://freenode.net/Wikinews-en). I will happily call anywhere for the chance to conduct the interview, or any other venue which would be most convenient.
+
+Best regards,
+
+Amgine
+
+End forwarded message ---
+
+Subject: Re: [Fwd: Re: [Ticket#2008010610008625] Interview with Sue Gardner]
+
+Date: January 7, 2008 7:53:44 PM PST
+
+To: Amgine <edited>
+
+Cc: Erik <edited>
