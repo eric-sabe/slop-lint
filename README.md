@@ -120,15 +120,18 @@ Put a `.slop-lint.json` next to where you run the tool (it is picked up automati
 ```json
 {
   "allow": ["tapestry", "robust", "deep dive"],
-  "profiles": ["pr"]
+  "profiles": ["pr"],
+  "ignore": ["docs/research"]
 }
 ```
+
+`ignore` works like `--ignore`: directory walks skip any path containing an entry, while files you name explicitly are still linted. This repo's own `.slop-lint.json` ignores `docs/research` and `corpus/`, which hold quoted tells, human baseline text and model samples on purpose.
 
 How `allow` matches: each entry is a word or phrase written as it would appear in prose, and it disables every word/phrase rule that entry triggers, case-insensitively. So you can paste the flagged text from the report verbatim, and an entry like `"rich cultural tapestry"` silences both the phrase pattern and the word inside it. Matching is per catalogue entry: allowing `delve` leaves `delves` and `delving` flagged.
 
 Notes:
 
-- `--config <file>` reads an explicit path instead (the default file is then ignored); `--allow` and `--profile` add entries on top.
+- `--config <file>` reads an explicit path instead (the default file is then ignored); `--allow`, `--profile` and `--ignore` add entries on top.
 - Typography (em-dash, `--`, smart quotes, emoji) and machine artifacts are never suppressed.
 - A missing `.slop-lint.json` is fine (zero-config stays the default); a present-but-broken one stops the run with exit code 2 rather than silently linting without it.
 

@@ -481,3 +481,17 @@ test("code history rule skips version and deprecation notes", () => {
   assert.ok(!has(go, "history narration", { code: CODE_EXTS[".go"], profiles: ["code"] }));
   assert.ok(has("// This function was added to replace the old parser\n", "history narration", { code: CODE_EXTS[".ts"], profiles: ["code"] }));
 });
+
+test("config ignore list skips paths on directory walks", () => {
+  const dir = mkdtempSync(join(tmpdir(), "slop-lint-ign-"));
+  const cfg = join(dir, "c.json");
+  writeFileSync(cfg, JSON.stringify({ ignore: ["notes"] }));
+  assert.deepEqual(readConfig(cfg), { allow: [], ignore: ["notes"] });
+  const bad = join(dir, "b.json");
+  writeFileSync(bad, JSON.stringify({ ignore: [3] }));
+  assert.throws(() => readConfig(bad), /"ignore" must be/);
+  // the repo's own config keeps docs/research (which quotes tells) out of `slop-lint .`
+  assert.ok(readConfig(".slop-lint.json").ignore.includes("docs/research"));
+  const out = execFileSync(process.execPath, [CLI, "--quiet", "--no-rates", "docs"], { encoding: "utf8" });
+  assert.ok(!out.includes("docs/research"), "docs/research is skipped by the default config");
+});

@@ -69,6 +69,9 @@ on scopes and rates.
   `npm run skill` (`build-skill.mjs`), and tests fail when it is stale, when the skill does
   not name the current catalogue version, or when any skill file lints dirty.
 - U+202F narrow no-break space warning.
+- `"ignore"` in `.slop-lint.json`: path substrings skipped on directory walks, like
+  `--ignore`. The repo's own config ignores `docs/research` and `corpus/` (quoted tells and test
+  data), so `slop-lint .` at the repo root passes.
 
 ### Changed
 

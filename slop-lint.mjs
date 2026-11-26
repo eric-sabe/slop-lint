@@ -619,7 +619,9 @@ export const CODE_EXTS = {
   ".toml": HASH, ".r": HASH, ".ps1": HASH, ".sql": DASH, ".lua": DASH,
 };
 
-// Read a config file: { "allow": ["word or phrase", ...], "profiles": ["pr", ...] }.
+// Read a config file: { "allow": ["word or phrase", ...], "profiles": ["pr", ...],
+// "ignore": ["path substring", ...] }. "ignore" works like --ignore: directory walks skip
+// any path containing an entry (files named explicitly are still linted).
 // Throws (with the path in the message) on unreadable, unparsable, or malformed content;
 // a broken config should stop the run, not silently lint without it.
 export function readConfig(path) {
@@ -631,12 +633,21 @@ export function readConfig(path) {
   if (!Array.isArray(allow) || allow.some((a) => typeof a !== "string" || !a.trim())) {
     throw new Error(`config ${path}: "allow" must be an array of non-empty strings`);
   }
-  if (cfg.profiles === undefined) return { allow };
-  const profiles = cfg.profiles;
-  if (!Array.isArray(profiles) || profiles.some((p) => !Object.hasOwn(PROFILES, p))) {
-    throw new Error(`config ${path}: "profiles" must be an array of: ${Object.keys(PROFILES).join(", ")}`);
+  const out = { allow };
+  if (cfg.profiles !== undefined) {
+    const profiles = cfg.profiles;
+    if (!Array.isArray(profiles) || profiles.some((p) => !Object.hasOwn(PROFILES, p))) {
+      throw new Error(`config ${path}: "profiles" must be an array of: ${Object.keys(PROFILES).join(", ")}`);
+    }
+    out.profiles = profiles;
   }
-  return { allow, profiles };
+  if (cfg.ignore !== undefined) {
+    if (!Array.isArray(cfg.ignore) || cfg.ignore.some((a) => typeof a !== "string" || !a.trim())) {
+      throw new Error(`config ${path}: "ignore" must be an array of non-empty strings`);
+    }
+    out.ignore = cfg.ignore;
+  }
+  return out;
 }
 
 // -- Document model -------------------------------------------------------------
@@ -1094,6 +1105,7 @@ function main(argv) {
     const cfg = configPath ? readConfig(configPath) : existsSync(DEFAULT_CONFIG) ? readConfig(DEFAULT_CONFIG) : { allow: [] };
     allow.push(...cfg.allow);
     profiles.push(...(cfg.profiles || []));
+    ignore.push(...(cfg.ignore || []));
   } catch (e) { console.error(`slop-lint: ${e.message}`); return 2; }
   const codeMode = profiles.includes("code");
   const walkExts = exts || (codeMode ? [...DEFAULT_EXTS, ...Object.keys(CODE_EXTS)] : DEFAULT_EXTS);
