@@ -4,7 +4,7 @@
   "description": "Zero-dependency linter that flags AI 'slop' in prose: fails on the em-dash, warns on LLM tells (words, cliches, constructions).",
   "type": "module",
   "bin": {
-    "slop-lint": "./slop-lint.mjs"
+    "slop-lint": "slop-lint.mjs"
   },
   "exports": "./slop-lint.mjs",
   "files": [
