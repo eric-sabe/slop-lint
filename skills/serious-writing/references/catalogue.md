@@ -300,7 +300,7 @@ offer-of-help close ("let me know if you'd like")  [last]
 offer-of-help close ("Happy to ...", "feel free to ask")  [last]
     /\b(happy to (help|walk you through|go deeper|dig (in|deeper)|elaborate|expand)|feel free to (ask|reach out|let me know))\b/i
 knowledge-cutoff disclaimer (assistant leakage)
-    /\bas of my (last|latest) (knowledge|training)( (update|cutoff|cut-off))?\b|\bmy knowledge cut-?off\b/i
+    /\b(as of|up to|until) my (last|latest) (knowledge|training)( (update|cutoff|cut-off|data))?\b|\bmy knowledge cut-?off\b/i
 capability disclaimer (assistant leakage)
     /\bi (don'?t|do not) have (access to real-time|real-time|personal (opinions|experiences|feelings))\b/i
 revision-request leakage ("Here is a revised version", "improved clarity and flow")
@@ -322,6 +322,23 @@ puffery ("a poignant reminder")
     /\bbec(ome|ame|omes|oming) a focal point\b/i
 vague attribution ("experts argue"): name the source
     /\bexperts (argue|say|agree|note)\b|\bobservers (note|say)\b|\ba growing body of (research|literature|evidence)\b/i
+```
+
+```
+# Wikipedia: Signs of AI writing (Words to watch); contributed in PR #9
+# since 0.10.0; evidence P; screened 2026-11-25
+advice disclaimer (assistant leakage)
+    /\bi can(no|')?t (offer|provide|give) (medical|legal|financial|professional) advice\b/i
+"in the provided sources" (retrieval leakage)
+    /\bin the (provided|available) (sources|search results|documents|context)\b/i
+"based on available information" hedge
+    /\bbased on (the )?available information\b/i
+"while specific details are limited" hedge
+    /\bwhile (specific )?details (are|remain) (limited|scarce)\b/i
+"not widely documented" hedge
+    /\bnot widely (documented|disclosed|reported)\b/i
+"marks a broader shift" significance inflation
+    /\b(represents|marks|reflects|signals) a (broader |wider |fundamental )?shift\b/i
 ```
 
 ```
@@ -494,6 +511,13 @@ fiction slop: "heart hammered against her ribs"
 ### wiki
 
 encyclopedic prose: notability padding, legacy puffery, stock sections.
+
+```
+# Wikipedia: Signs of AI writing (Words to watch, AIDISCLAIMER); contributed in PR #9
+# since 0.10.0; evidence P; screened 2026-11-25
+"does not by itself establish" hedge
+    /\bdoes not (by itself|in itself) establish\b/i
+```
 
 ```
 # Wikipedia: Signs of AI writing (AILEGACY, ITSHAPESDISCUSSIONS, AIATTR, AIIDENTIFY), 2026 examples

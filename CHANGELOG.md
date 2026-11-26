@@ -29,7 +29,7 @@ on scopes and rates.
   `methodically`); the 2025-2026 staging vocabulary (`load-bearing`, 0.5 to 12.0 hits per
   10k words across one user's Opus 4.6 and 4.7 sessions; `quietly`; `genuinely`); and opt-in groups
   for reviews, PR text and fiction.
-- **68 phrase rules** (37 always on, 31 in profiles): assistant leakage and openers
+- **75 phrase rules** (43 always on, 32 in profiles): assistant leakage and openers
   (`Certainly!`, knowledge-cutoff and capability disclaimers, "Here is a revised
   version"); offer-of-help closers scoped to the last two sentences; puffery ("a poignant reminder", "the complex interplay", "faced numerous challenges":
   Pangram's February 2025 post puts five such phrases at 21,000x to 49,000x the human
@@ -41,6 +41,14 @@ on scopes and rates.
   "Not X. Not Y. Z.", "The question isn't X. The question is Y.", "is no longer X. It is
   Y." promoted from PENDING, "You're not X. You're Y."); the participial tail; stacked
   hedges; and "experts argue" attribution.
+- **Wikipedia words-to-watch rules, contributed by @malcollmhollmes in #9** (issue #8):
+  advice disclaimers ("I cannot offer medical advice"), retrieval leakage ("in the
+  provided sources"), "based on available information", "while specific details are
+  limited", "not widely documented", "marks a broader shift", the "up to my last
+  training cutoff" form of the knowledge-cutoff rule, and "does not by itself establish"
+  in the `wiki` profile only (it stays held elsewhere; see below).
+  Screened here against the 2.3M-word register corpora; "not widely available" and
+  "does not necessarily establish" were dropped as ordinary English.
 - **Profiles** (`--profile`, or `"profiles"` in `.slop-lint.json`): `pr`, `email`,
   `social`, `fiction`, `wiki`, `review`, `academic`, `code`. Register-bound tells live
   there so they cost nothing elsewhere. "studies have shown" ships in `academic` only,
@@ -115,7 +123,7 @@ on scopes and rates.
   weak alone.
 - Held, with reasons in `corpus/specimens/PENDING.md`: bare "honestly", "frankly", "potent",
   "amidst" and "unprecedented" (baseline hits), the GPT-5.6-era "does not by itself
-  establish" disclaimers (they conflict with careful academic claim sizing), unlabelled
+  establish" disclaimers outside `wiki` (they conflict with careful academic claim sizing), unlabelled
   PR-corpus jargon, and five new one-source molds now mirrored in `PENDING_MOLDS`.
 - Measured evidence for 2025-2026 models is thin and mostly M2. No study retired any
   entry, so nothing was deleted.

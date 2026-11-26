@@ -411,7 +411,7 @@ export const PHRASE_GROUPS = [
       { re: /\bi'?d be (more than )?happy to (help|assist)\b|\bi am happy to (help|assist)\b/i, msg: 'assistant voice ("I\'d be happy to help")' },
       { re: /\b(let me know if you('d| would)? (like|want|need)|would you like me to|is there anything else (i|we) can)\b/i, msg: 'offer-of-help close ("let me know if you\'d like")', position: "last" },
       { re: /\b(happy to (help|walk you through|go deeper|dig (in|deeper)|elaborate|expand)|feel free to (ask|reach out|let me know))\b/i, msg: 'offer-of-help close ("Happy to ...", "feel free to ask")', position: "last" },
-      { re: /\bas of my (last|latest) (knowledge|training)( (update|cutoff|cut-off))?\b|\bmy knowledge cut-?off\b/i, msg: 'knowledge-cutoff disclaimer (assistant leakage)' },
+      { re: /\b(as of|up to|until) my (last|latest) (knowledge|training)( (update|cutoff|cut-off|data))?\b|\bmy knowledge cut-?off\b/i, msg: 'knowledge-cutoff disclaimer (assistant leakage)' },
       { re: /\bi (don'?t|do not) have (access to real-time|real-time|personal (opinions|experiences|feelings))\b/i, msg: 'capability disclaimer (assistant leakage)' },
       { re: /\bhere is (a|the) revised version\b|\bimproved (the )?(clarity|readability|flow)(,? (and )?(clarity|readability|flow|structure|consistency|concision))+\b|\bpreserv(ed|ing) (the )?existing (behaviou?r|structure|formatting|content|wording)\b/i, msg: 'revision-request leakage ("Here is a revised version", "improved clarity and flow")' },
     ],
@@ -428,6 +428,37 @@ export const PHRASE_GROUPS = [
       { re: /\b(newfound|renewed) sense of (purpose|hope|belonging)\b/i, msg: '"a newfound sense of purpose"' },
       { re: /\bbec(ome|ame|omes|oming) a focal point\b/i, msg: '"become a focal point"' },
       { re: /\bexperts (argue|say|agree|note)\b|\bobservers (note|say)\b|\ba growing body of (research|literature|evidence)\b/i, msg: 'vague attribution ("experts argue"): name the source' },
+    ],
+  },
+  {
+    // Contributed in PR #9 (malcollmhollmes, issue #8): Wikipedia "Words to watch",
+    // re-checked against the live page 2026-11-08. Screened here against
+    // corpus/baseline and the pre-2023 register corpora (2.3M words): 0 hits, after
+    // dropping "not widely available" (ordinary English: "not widely available in
+    // translation"). Chat and search-answer leakage, so long-form samples rarely show it.
+    since: "0.10.0",
+    source: "Wikipedia: Signs of AI writing (Words to watch); contributed in PR #9",
+    screened: "2026-11-25",
+    evidence: "P",
+    rules: [
+      { re: /\bi can(no|')?t (offer|provide|give) (medical|legal|financial|professional) advice\b/i, msg: 'advice disclaimer (assistant leakage)' },
+      { re: /\bin the (provided|available) (sources|search results|documents|context)\b/i, msg: '"in the provided sources" (retrieval leakage)' },
+      { re: /\bbased on (the )?available information\b/i, msg: '"based on available information" hedge' },
+      { re: /\bwhile (specific )?details (are|remain) (limited|scarce)\b/i, msg: '"while specific details are limited" hedge' },
+      { re: /\bnot widely (documented|disclosed|reported)\b/i, msg: '"not widely documented" hedge' },
+      { re: /\b(represents|marks|reflects|signals) a (broader |wider |fundamental )?shift\b/i, msg: '"marks a broader shift" significance inflation' },
+    ],
+  },
+  {
+    // Also from PR #9. Held out of always-on and academic: careful papers size claims
+    // this way (serious-writing commandment 12). In wiki prose it is the notability hedge.
+    since: "0.10.0",
+    source: "Wikipedia: Signs of AI writing (Words to watch, AIDISCLAIMER); contributed in PR #9",
+    screened: "2026-11-25",
+    evidence: "P",
+    profile: "wiki",
+    rules: [
+      { re: /\bdoes not (by itself|in itself) establish\b/i, msg: '"does not by itself establish" hedge' },
     ],
   },
   {

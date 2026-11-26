@@ -338,6 +338,25 @@ test("assistant leakage is flagged", () => {
   assert.ok(has("Here is a revised version of your review.", "revision-request leakage"));
 });
 
+test("Wikipedia words-to-watch rules from PR #9 fire, and their near misses do not", () => {
+  assert.ok(has("Up to my last training cutoff, the rule stood.", "knowledge-cutoff"));
+  assert.ok(has("I cannot offer medical advice on this.", "advice disclaimer"));
+  assert.ok(has("I can't provide legal advice here.", "advice disclaimer"));
+  assert.ok(has("No record appears in the provided sources.", "retrieval leakage"));
+  assert.ok(has("Based on available information, the mill closed in 1902.", "available information"));
+  assert.ok(has("While specific details are limited, the firm grew.", "details are limited"));
+  assert.ok(has("This does not by itself establish notability.", "by itself establish", { profiles: ["wiki"] }));
+  assert.ok(!has("This does not by itself establish causation.", "by itself establish", { profiles: ["academic"] }));
+  assert.ok(has("Her early life is not widely documented.", "not widely documented"));
+  assert.ok(has("The law marks a broader shift in policy.", "broader shift"));
+  for (const ok of [
+    "The first two novels were not widely available in English.",
+    "A positive test does not necessarily establish infection.",
+    "The night shift starts at ten.",
+    "Details are in the appendix.",
+  ]) assert.equal(lintText(ok).hits.length, 0, ok);
+});
+
 test("machine artifacts fail and cannot be allowed", () => {
   const t = "See [the docs](https://x.org/a?utm_source=chatgpt.com) and :contentReference[oaicite:2]{index=2}.";
   const r = lintText(t, { allow: ["utm_source=chatgpt.com", "oaicite"] });
