@@ -4,6 +4,20 @@ Notable changes to the slop-lint tool and its tell catalogue. Format roughly fol
 [Keep a Changelog](https://keepachangelog.com/); the package version and the catalogue
 version move together.
 
+## [Unreleased]
+
+### Changed
+
+- **The monthly refresh issue lists only new items.** `refresh.mjs` expands Wikipedia's
+  template wording ("...in the provided/available sources...") before testing it
+  against the catalogue, and skips items recorded in the new
+  `corpus/refresh-reviewed.json` (34 decisions from the 0.10.0 review). The workflow
+  files an issue only when something is new and closes the previous one. Against
+  0.10.0, 8 of 92 Wikipedia items are new, down from 46.
+- **Corpus discovery is opt-in** (`node refresh.mjs --corpus`) and keeps only words found
+  in at least a quarter of the sample prompts. The corpus is static, so the monthly
+  table repeated the same prompt-topic words ("coffee", "jazz", "silk road") each month.
+
 ## [0.10.0]
 
 Sourced from a five-track research pass (2026-11-25) over corpus studies, stylometry,

@@ -514,3 +514,19 @@ test("config ignore list skips paths on directory walks", () => {
   const out = execFileSync(process.execPath, [CLI, "--quiet", "--no-rates", "docs"], { encoding: "utf8" });
   assert.ok(!out.includes("docs/research"), "docs/research is skipped by the default config");
 });
+
+test("refresh: Wikipedia templates expand, and covered or reviewed items are not re-raised", async () => {
+  const { expandTemplate, isCovered, loadReviewed } = await import("../refresh.mjs");
+  assert.deepEqual(expandTemplate("...in the provided/available sources / search results..."),
+    ["in the provided sources", "in the available sources", "search results"]);
+  assert.deepEqual(expandTemplate("[claim] should be [treated/presented] as"), ["X should be X as"]);
+  assert.ok(isCovered("...in the provided/available sources / search results..."));
+  assert.ok(isCovered("despite these challenges"));
+  assert.ok(!isCovered("key turning point"));
+  const reviewed = loadReviewed(fileURLToPath(new URL("../corpus/refresh-reviewed.json", import.meta.url)));
+  assert.ok(Object.keys(reviewed).length > 0);
+  for (const [item, decision] of Object.entries(reviewed)) {
+    assert.match(decision, /^(added|covered|rejected|held)\b/, item);
+    assert.ok(!isCovered(item) || decision.startsWith("covered"), `${item} is now matched; drop it or mark it covered`);
+  }
+});
