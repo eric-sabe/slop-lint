@@ -44,9 +44,9 @@ profound noteworthy notable versatile invaluable elevate foster garner
 # Pangram / Grammarly / practitioner marketing-buzzword blacklists
 # since 0.1.0; evidence P; era: GPT-4 (2023-2025; the GPT-4-era PR cluster fell from 11.4% to 1.5% of PR descriptions by Nov 2026)
 leverage leveraging synergy robust seamless seamlessly transformative scalable
-cutting-edge game-changer game changer paradigm holistic empower harness unleash unlock
-utilize utilise supercharge state-of-the-art best-in-class vibrant multifaceted
-revolutionize ever-evolving fast-paced comprehensive
+cutting-edge game-changer game changer paradigm holistic empower unleash unlock utilize
+utilise supercharge state-of-the-art best-in-class vibrant multifaceted revolutionize
+ever-evolving fast-paced comprehensive
 ```
 
 ```
@@ -87,8 +87,8 @@ resonated resonating
 ```
 # Kobak et al. 2025 (Science Advances) excess-vocabulary list: inflections of catalogued stems
 # since 0.10.0; evidence M1; era: GPT-3.5/4 (2023-2025)
-delved showcased underscored fosters fostering garnering leverages harnesses harnessing
-empowers unlocking revolutionizing realms encompass encompasses encompassed surpassing
+delved showcased underscored fosters fostering garnering leverages harnessing empowers
+unlocking revolutionizing realms encompass encompasses encompassed surpassing
 illuminates illuminating utilizes intricacies
 ```
 
@@ -125,6 +125,13 @@ camaraderie palpable
 ## Phrases and constructions (always on)
 
 Each entry is the linter's message, then its pattern. Rules marked `last` only apply to the last two sentences, `first` to the first sentence.
+
+```
+# Kobak et al. 2025 (harnesses); practitioner buzzword lists (harness); narrowed after the transcript sweep
+# since 0.10.1; evidence M1
+word "harness" (as a verb)
+    /(?<!\b(the|a|an|our|your|their|its|this|that|each|every|new|test|eval|benchmark|integration) )\bharness(es)? (the|its|their|our|your|his|her|this|these|that|those|every|ai|data|technology|power|potential)\b|\bto harness\b/i
+```
 
 ```
 # Wikipedia 'Signs of AI writing' essay; practitioner blacklists

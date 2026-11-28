@@ -102,7 +102,7 @@ export const WORD_GROUPS = [
     words: [
       "leverage", "leveraging", "synergy", "robust", "seamless", "seamlessly",
       "transformative", "scalable", "cutting-edge", "game-changer", "game changer",
-      "paradigm", "holistic", "empower", "harness", "unleash", "unlock", "utilize",
+      "paradigm", "holistic", "empower", "unleash", "unlock", "utilize",
       "utilise", "supercharge", "state-of-the-art", "best-in-class", "vibrant",
       "multifaceted", "revolutionize", "ever-evolving", "fast-paced", "comprehensive",
     ],
@@ -170,7 +170,7 @@ export const WORD_GROUPS = [
     era: "GPT-3.5/4 (2023-2025)",
     words: [
       "delved", "showcased", "underscored", "fosters", "fostering", "garnering",
-      "leverages", "harnesses", "harnessing", "empowers", "unlocking", "revolutionizing",
+      "leverages", "harnessing", "empowers", "unlocking", "revolutionizing",
       "realms", "encompass", "encompasses", "encompassed", "surpassing", "illuminates",
       "illuminating", "utilizes", "intricacies",
     ],
@@ -282,6 +282,18 @@ export const ALL_WORDS = WORD_GROUPS.flatMap((g) => g.words);
 //             is tried from each sentence start, so the two-sentence shape is caught
 //             when a soft line break splits it
 export const PHRASE_GROUPS = [
+  {
+    // "harness" and "harnesses" moved from the word lists (0.1.0 buzzwords; Kobak et al.
+    // for "harnesses"): as nouns they are engineering vocabulary ("test harness", "the
+    // eval harness"), most of the hits in one user's 2026 Claude Code sessions. Only the
+    // verb is the tell. "harnessing" and "harnessed" stay word rules.
+    since: "0.10.1",
+    source: "Kobak et al. 2025 (harnesses); practitioner buzzword lists (harness); narrowed after the transcript sweep",
+    evidence: "M1",
+    rules: [
+      { re: /(?<!\b(the|a|an|our|your|their|its|this|that|each|every|new|test|eval|benchmark|integration) )\bharness(es)? (the|its|their|our|your|his|her|this|these|that|those|every|ai|data|technology|power|potential)\b|\bto harness\b/i, msg: 'word "harness" (as a verb)' },
+    ],
+  },
   {
     since: "0.1.0",
     source: "Wikipedia 'Signs of AI writing' essay; practitioner blacklists",

@@ -1,8 +1,9 @@
 name: catalogue-refresh
 
 # Monthly self-contained sweep for candidate new tells. No secrets, no external
-# services: runs refresh.mjs (corpus frequency analysis + the public Wikipedia
-# "Signs of AI writing" essay) and files the report as an issue for human review.
+# services: runs refresh.mjs against the public Wikipedia "Signs of AI writing" essay
+# and files the report as an issue for human review, only when it lists items not yet
+# matched by the catalogue or recorded in corpus/refresh-reviewed.json.
 on:
   schedule:
     - cron: "0 9 1 * *" # 09:00 UTC on the 1st of each month
@@ -21,8 +22,19 @@ jobs:
         with:
           node-version: "20"
       - name: Generate candidate report
+        id: refresh
         run: REFRESH_DATE="$(date +%Y-%m-%d)" node refresh.mjs > /dev/null
-      - name: File report as an issue
+      - name: Warn when the source was unreachable
+        if: steps.refresh.outputs.new == '-1'
+        run: echo "::warning::Wikipedia was unreachable or unparseable; no issue filed."
+      # File only when something is new, then close earlier refresh issues so one
+      # stays open. Decisions go in corpus/refresh-reviewed.json, so items do not repeat.
+      - name: File report and close earlier ones
+        if: steps.refresh.outputs.new != '0' && steps.refresh.outputs.new != '-1'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh issue create --title "Catalogue refresh $(date +%Y-%m)" --body-file refresh-report.md
+        run: |
+          url=$(gh issue create --title "Catalogue refresh $(date +%Y-%m)" --body-file refresh-report.md)
+          gh issue list --state open --search 'in:title "Catalogue refresh"' --json number,url \
+            --jq ".[] | select(.url != \"$url\") | .number" |
+            while read -r n; do gh issue close "$n" --comment "Superseded by $url"; done

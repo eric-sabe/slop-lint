@@ -4,3 +4,4 @@ node_modules/
 .env
 refresh-report.md
 corpus/registers/
+corpus/transcripts/
