@@ -6,7 +6,20 @@ version move together.
 
 ## [Unreleased]
 
+### Added
+
+- **`mine-transcripts.mjs`** measures catalogue rules on your own Claude Code sessions,
+  by model, with sessions that had a writing skill reported separately. A first run is
+  summarized in `docs/research/2026-11-transcript-sweep.md`. Opus 5.5 nearly dropped
+  the em-dash on its own, while bold lead-in bullet runs tripled and no-ai-tells barely
+  moved them.
+
 ### Changed
+
+- **"harness" and "harnesses" fire only as verbs** ("harness the", "to harness"). As
+  nouns they are engineering vocabulary ("test harness"), which accounted for nearly
+  all of their hits in the transcript sweep. "harnessing" and "harnessed" stay word
+  rules.
 
 - **The monthly refresh issue lists only new items.** `refresh.mjs` expands Wikipedia's
   template wording ("...in the provided/available sources...") before testing it

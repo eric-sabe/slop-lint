@@ -530,3 +530,26 @@ test("refresh: Wikipedia templates expand, and covered or reviewed items are not
     assert.ok(!isCovered(item) || decision.startsWith("covered"), `${item} is now matched; drop it or mark it covered`);
   }
 });
+
+test("harness is flagged as a verb, not as the engineering noun", () => {
+  assert.ok(has("We harness the power of data.", "as a verb"));
+  assert.ok(has("The goal is to harness it.", "as a verb"));
+  for (const ok of ["The test harness runs nightly.", "Both eval harnesses pass.", "The harness the team built works."])
+    assert.equal(lintText(ok).hits.length, 0, ok);
+});
+
+test("mine-transcripts: per-model rule rates from a synthetic session dir, loops dropped", () => {
+  const root = mkdtempSync(join(tmpdir(), "slop-mine-"));
+  const out = mkdtempSync(join(tmpdir(), "slop-mine-out-"));
+  const rec = (model, text) => JSON.stringify({ type: "assistant", timestamp: "2026-11-01T00:00:00Z", message: { model, content: [{ type: "text", text }] } });
+  const proj = join(root, "-Users-x-git-demo");
+  execFileSync("mkdir", ["-p", proj]);
+  writeFileSync(join(proj, "a.jsonl"), [rec("model-a-1", "We should leverage the new cache. It is robust."), rec("model-a-1", "word\n\n".repeat(400))].join("\n"));
+  writeFileSync(join(proj, "b.jsonl"), [rec("model-a-2", "The cache is faster now. Tests pass."), "not json"].join("\n"));
+  execFileSync(process.execPath, [fileURLToPath(new URL("../mine-transcripts.mjs", import.meta.url)), "--root", root, "--out", out, "--min-words", "1"], { stdio: "pipe" });
+  const report = readFileSync(join(out, "report.md"), "utf8");
+  assert.match(report, /\| model-a-1 \| 2026-11-01 to 2026-11-01 \| \d+ \| 1 \| 1 \|/);
+  assert.match(report, /word "leverage"/);
+  assert.match(report, /Risers and fallers: model-a-1 to model-a-2/);
+  assert.doesNotMatch(report, /We should leverage/);
+});
