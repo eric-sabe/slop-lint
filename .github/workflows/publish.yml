@@ -1,16 +1,22 @@
 name: publish
 
-# Publishes to npm when a v* tag is pushed (or on manual dispatch). Requires an
-# NPM_TOKEN repo secret: an npm "Automation" access token (it bypasses 2FA, which CI
-# needs). Set it at Settings > Secrets and variables > Actions.
+# On a v* tag: test, check the tag against package.json and CHANGELOG.md, publish to
+# npm, then create the GitHub release (CHANGELOG section as notes, serious-writing skill
+# zip attached). Requires an NPM_TOKEN repo secret: an npm granular access token with
+# read and write on slop-lint and "Bypass two-factor authentication" ticked, since CI
+# cannot enter a one-time code. Set it with `gh secret set NPM_TOKEN`.
 on:
   push:
     tags: ["v*"]
-  workflow_dispatch: {}
+
+permissions:
+  contents: write # create the GitHub release
 
 jobs:
   publish:
     runs-on: ubuntu-latest
+    env:
+      TAG: ${{ github.ref_name }}
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
@@ -19,7 +25,32 @@ jobs:
           registry-url: "https://registry.npmjs.org"
       - name: Test before publishing
         run: node --test
-      - name: Publish
+      # A tag pushed on the wrong commit would otherwise publish the wrong version.
+      - name: Check tag, package version and changelog agree
+        run: |
+          v="${TAG#v}"
+          pkg="$(node -p 'require("./package.json").version')"
+          cli="$(node slop-lint.mjs --version)"
+          if [ "$v" != "$pkg" ] || [ "$v" != "$cli" ]; then
+            echo "::error::tag $TAG, package.json $pkg and --version $cli disagree"; exit 1
+          fi
+          awk -v h="## [$v]" 'index($0, h) == 1 { f = 1; next } /^## \[/ { f = 0 } f' CHANGELOG.md > notes.md
+          if ! grep -q '[^[:space:]]' notes.md; then
+            echo "::error::CHANGELOG.md has no section for $v"; exit 1
+          fi
+      - name: Publish to npm
         run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          v="${TAG#v}"
+          (cd skills && zip -qr -X "../serious-writing-$v.zip" serious-writing)
+          {
+            printf 'Install: `npx slop-lint@%s <files>` or `npm i -D slop-lint`.\n\n' "$v"
+            printf '`serious-writing-%s.zip` is the companion skill (catalogue %s) for upload to claude.ai.\n\n' "$v" "$v"
+            cat notes.md
+          } > body.md
+          gh release create "$TAG" --title "$TAG" --notes-file body.md --latest "serious-writing-$v.zip"

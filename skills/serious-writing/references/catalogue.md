@@ -1,6 +1,6 @@
 # Catalogue (generated)
 
-Generated from slop-lint.mjs catalogue 0.10.0 by `node build-skill.mjs`. Do not edit by hand: change the linter, then regenerate. Every entry is a ban for serious-writing, whatever its severity in the linter. Matching is case-insensitive and whole-word for words. Tells are listed only inside code blocks, which the linter skips, so this file lints clean.
+Generated from slop-lint.mjs catalogue 0.10.1 by `node build-skill.mjs`. Do not edit by hand: change the linter, then regenerate. Every entry is a ban for serious-writing, whatever its severity in the linter. Matching is case-insensitive and whole-word for words. Tells are listed only inside code blocks, which the linter skips, so this file lints clean.
 
 Evidence grades: M1 large corpus or controlled study, M2 measured but weaker, P independent practitioner reports, A anecdote. An era label records when a tell peaked. It does not lift the ban: older models stay in use.
 
