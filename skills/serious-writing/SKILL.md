@@ -1,6 +1,6 @@
 ---
 name: serious-writing
-description: "Apply to every reply and every written deliverable: chat answers, files, commit messages, PR descriptions, code comments, email, docs, reports, specs, proposals and papers. Covers two things. First, the slop-lint contract: write so the linter (catalogue 0.10.0) reports zero FAIL and zero WARN lines, with each advisory rate fixed or justified, plus the structural tells no regex can see. Second, professional-writing craft: twelve commandments, each with a test you run on your own draft, for any document a cold expert reader will act on or judge. Load references/academic.md for papers, theses, abstracts, research proposals, literature reviews and peer reviews. Load references/registers.md for chat, email, social posts, PR and commit text, code comments and encyclopedic articles. Replaces no-ai-tells and serious-academic."
+description: "Apply to every reply and every written deliverable: chat answers, files, commit messages, PR descriptions, code comments, email, docs, reports, specs, proposals and papers. Covers two things. First, the slop-lint contract: write so the linter (catalogue 0.10.1) reports zero FAIL and zero WARN lines, with each advisory rate fixed or justified, plus the structural tells no regex can see. Second, professional-writing craft: twelve commandments, each with a test you run on your own draft, for any document a cold expert reader will act on or judge. Load references/academic.md for papers, theses, abstracts, research proposals, literature reviews and peer reviews. Load references/registers.md for chat, email, social posts, PR and commit text, code comments and encyclopedic articles. Replaces no-ai-tells and serious-academic."
 ---
 
 # serious-writing
@@ -25,7 +25,7 @@ npx -y github:eric-sabe/slop-lint <file>                     # anywhere, main br
 npx -y github:eric-sabe/slop-lint --fail-on-warn --profile pr <file>
 ```
 
-This skill tracks catalogue 0.10.0. The npm package can lag the main branch, so check that `--version` prints 0.10.0 or later before relying on a clean run.
+This skill tracks catalogue 0.10.1. Check that `--version` prints 0.10.1 or later before relying on a clean run.
 
 The linter prints three kinds of line, each with its own symbol (a cross, a warning sign, an information sign):
 

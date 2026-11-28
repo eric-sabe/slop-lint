@@ -4,10 +4,14 @@ Notable changes to the slop-lint tool and its tell catalogue. Format roughly fol
 [Keep a Changelog](https://keepachangelog.com/); the package version and the catalogue
 version move together.
 
-## [Unreleased]
+## [0.10.1]
 
 ### Added
 
+- **GitHub releases are automatic.** The publish workflow checks that the tag matches
+  `package.json` and that `CHANGELOG.md` has a section for it, publishes to npm, then
+  creates the GitHub release with that section as notes and the serious-writing skill
+  zip attached. 0.9.0 and 0.9.1 were never tagged or published; 0.10.0 includes them.
 - **`mine-transcripts.mjs`** measures catalogue rules on your own Claude Code sessions,
   by model, with sessions that had a writing skill reported separately. A first run is
   summarized in `docs/research/2026-11-transcript-sweep.md`. Opus 5.5 nearly dropped
@@ -20,7 +24,6 @@ version move together.
   nouns they are engineering vocabulary ("test harness"), which accounted for nearly
   all of their hits in the transcript sweep. "harnessing" and "harnessed" stay word
   rules.
-
 - **The monthly refresh issue lists only new items.** `refresh.mjs` expands Wikipedia's
   template wording ("...in the provided/available sources...") before testing it
   against the catalogue, and skips items recorded in the new

@@ -56,7 +56,7 @@ import { readFileSync, readdirSync, statSync, existsSync, realpathSync } from "n
 import { join, sep, extname } from "node:path";
 import { pathToFileURL } from "node:url";
 
-export const VERSION = "0.10.0";
+export const VERSION = "0.10.1";
 
 // Opt-in register groups. A WORD_GROUPS / PHRASE_GROUPS entry with a `profile` only
 // runs when that profile is enabled (--profile, or "profiles" in .slop-lint.json).
